@@ -1,0 +1,199 @@
+{
+  "dataset_summary": {
+    "train_samples": 199364,
+    "val_samples": 42721,
+    "test_samples": 42722,
+    "train_fraud_count": 384,
+    "val_fraud_count": 56,
+    "test_fraud_count": 52,
+    "train_fraud_rate_pct": 0.19261250777472363,
+    "test_fraud_rate_pct": 0.12171714807359206
+  },
+  "models": {
+    "baseline_logistic": {
+      "validation_threshold_optimization": {
+        "cost_optimal_threshold": 0.9821442885771544,
+        "recall_constrained_threshold": 0.99,
+        "max_f1_threshold": 0.9999929015682338
+      },
+      "test_metrics_at_cost_optimal_threshold": {
+        "threshold": 0.9821442885771544,
+        "pr_auc": 0.7066009684672138,
+        "roc_auc": 0.9772901606244705,
+        "precision": 0.4642857142857143,
+        "recall": 0.75,
+        "f1": 0.5735294117647058,
+        "confusion_matrix": {
+          "true_negatives": 42625,
+          "false_positives": 45,
+          "false_negatives": 13,
+          "true_positives": 39
+        },
+        "financial_cost": {
+          "cost_false_negative_unit": 500.0,
+          "cost_false_positive_unit": 15.0,
+          "total_estimated_loss_usd": 7175.0
+        }
+      },
+      "test_metrics_at_default_threshold": {
+        "threshold": 0.5,
+        "pr_auc": 0.7066009684672138,
+        "roc_auc": 0.9772901606244705,
+        "precision": 0.057104913678618856,
+        "recall": 0.8269230769230769,
+        "f1": 0.10683229813664596,
+        "confusion_matrix": {
+          "true_negatives": 41960,
+          "false_positives": 710,
+          "false_negatives": 9,
+          "true_positives": 43
+        },
+        "financial_cost": {
+          "cost_false_negative_unit": 500.0,
+          "cost_false_positive_unit": 15.0,
+          "total_estimated_loss_usd": 15150.0
+        }
+      }
+    },
+    "class_weighted_lgbm": {
+      "validation_threshold_optimization": {
+        "cost_optimal_threshold": 0.9683967935871745,
+        "recall_constrained_threshold": 0.9683967935871745,
+        "max_f1_threshold": 1.0
+      },
+      "test_metrics_at_cost_optimal_threshold": {
+        "threshold": 0.9683967935871745,
+        "pr_auc": 0.01944423678796861,
+        "roc_auc": 0.75452398550594,
+        "precision": 0.029676258992805755,
+        "recall": 0.6346153846153846,
+        "f1": 0.05670103092783505,
+        "confusion_matrix": {
+          "true_negatives": 41591,
+          "false_positives": 1079,
+          "false_negatives": 19,
+          "true_positives": 33
+        },
+        "financial_cost": {
+          "cost_false_negative_unit": 500.0,
+          "cost_false_positive_unit": 15.0,
+          "total_estimated_loss_usd": 25685.0
+        }
+      },
+      "test_metrics_at_default_threshold": {
+        "threshold": 0.5,
+        "pr_auc": 0.01944423678796861,
+        "roc_auc": 0.75452398550594,
+        "precision": 0.029649595687331536,
+        "recall": 0.6346153846153846,
+        "f1": 0.05665236051502146,
+        "confusion_matrix": {
+          "true_negatives": 41590,
+          "false_positives": 1080,
+          "false_negatives": 19,
+          "true_positives": 33
+        },
+        "financial_cost": {
+          "cost_false_negative_unit": 500.0,
+          "cost_false_positive_unit": 15.0,
+          "total_estimated_loss_usd": 25700.0
+        }
+      }
+    },
+    "smote_lgbm": {
+      "validation_threshold_optimization": {
+        "cost_optimal_threshold": 0.12587174348697397,
+        "recall_constrained_threshold": 0.5540080160320642,
+        "max_f1_threshold": 0.4230944626513757
+      },
+      "test_metrics_at_cost_optimal_threshold": {
+        "threshold": 0.12587174348697397,
+        "pr_auc": 0.7736008727365545,
+        "roc_auc": 0.9774440698743488,
+        "precision": 0.43478260869565216,
+        "recall": 0.7692307692307693,
+        "f1": 0.5555555555555556,
+        "confusion_matrix": {
+          "true_negatives": 42618,
+          "false_positives": 52,
+          "false_negatives": 12,
+          "true_positives": 40
+        },
+        "financial_cost": {
+          "cost_false_negative_unit": 500.0,
+          "cost_false_positive_unit": 15.0,
+          "total_estimated_loss_usd": 6780.0
+        }
+      },
+      "test_metrics_at_default_threshold": {
+        "threshold": 0.5,
+        "pr_auc": 0.7736008727365545,
+        "roc_auc": 0.9774440698743488,
+        "precision": 0.7755102040816326,
+        "recall": 0.7307692307692307,
+        "f1": 0.7524752475247525,
+        "confusion_matrix": {
+          "true_negatives": 42659,
+          "false_positives": 11,
+          "false_negatives": 14,
+          "true_positives": 38
+        },
+        "financial_cost": {
+          "cost_false_negative_unit": 500.0,
+          "cost_false_positive_unit": 15.0,
+          "total_estimated_loss_usd": 7165.0
+        }
+      }
+    },
+    "class_weighted_xgb": {
+      "validation_threshold_optimization": {
+        "cost_optimal_threshold": 0.053206412825651306,
+        "recall_constrained_threshold": 0.40474949899799606,
+        "max_f1_threshold": 0.9514154195785522
+      },
+      "test_metrics_at_cost_optimal_threshold": {
+        "threshold": 0.053206412825651306,
+        "pr_auc": 0.761031558451479,
+        "roc_auc": 0.9815408051053703,
+        "precision": 0.32231404958677684,
+        "recall": 0.75,
+        "f1": 0.4508670520231214,
+        "confusion_matrix": {
+          "true_negatives": 42588,
+          "false_positives": 82,
+          "false_negatives": 13,
+          "true_positives": 39
+        },
+        "financial_cost": {
+          "cost_false_negative_unit": 500.0,
+          "cost_false_positive_unit": 15.0,
+          "total_estimated_loss_usd": 7730.0
+        }
+      },
+      "test_metrics_at_default_threshold": {
+        "threshold": 0.5,
+        "pr_auc": 0.761031558451479,
+        "roc_auc": 0.9815408051053703,
+        "precision": 0.75,
+        "recall": 0.75,
+        "f1": 0.75,
+        "confusion_matrix": {
+          "true_negatives": 42657,
+          "false_positives": 13,
+          "false_negatives": 13,
+          "true_positives": 39
+        },
+        "financial_cost": {
+          "cost_false_negative_unit": 500.0,
+          "cost_false_positive_unit": 15.0,
+          "total_estimated_loss_usd": 6695.0
+        }
+      }
+    }
+  },
+  "business_cost_assumptions": {
+    "cost_false_negative_usd": 500.0,
+    "cost_false_positive_usd": 15.0,
+    "target_recall": 0.8
+  }
+}

@@ -1,0 +1,11 @@
+# Technical Decisions Log
+
+This document records non-obvious architecture and design choices made during the development of Phase 1 of the Fraud Intelligence Platform.
+
+| Date | Decision | Rationale | Alternatives Considered & Rejected |
+| :--- | :--- | :--- | :--- |
+| **2026-08-29** | **Chronological / Temporal Split along `Time`** | Fraud patterns, merchant profiles, and attacker vectors drift over time. A random split causes future-to-past data leakage and artificially inflates performance metrics. Splitting chronologically (70% train, 15% val, 15% test) guarantees real-world evaluation fidelity. | Random stratified split (rejected due to temporal leakage). |
+| **2026-08-29** | **PR-AUC as Headline Metric** | In extreme class imbalance (~0.17% fraud rate), ROC-AUC is misleadingly high because the vast true negative volume suppresses the False Positive Rate. Precision-Recall AUC focuses strictly on the minority class performance. | Accuracy (useless at 99.8% baseline), ROC-AUC (misleadingly optimistic). |
+| **2026-08-29** | **Strict Resampling Isolation via `imblearn.pipeline.Pipeline`** | Applying SMOTE before splitting or outside cross-validation folds leaks synthetic minority samples into validation distributions. Encapsulating resampling inside an `imblearn` pipeline guarantees zero validation leakage. | Standalone SMOTE before split (severe leakage bug). |
+| **2026-08-29** | **Cost-Utility Threshold Optimization** | Default decision threshold of 0.5 is arbitrary. In financial fraud, the cost of a False Negative (missed fraud, ~$500) vastly outweighs a False Positive (SMS prompt / friction, ~$15). Minimizing expected financial loss or targeting recall ≥ 80% yields higher business value. | Arbitrary 0.5 probability threshold, naive max-F1 threshold. |
+| **2026-08-29** | **Integrated Preprocessor + Model Persistence** | Saving the fitted preprocessing pipeline (`RobustScaler` / `ColumnTransformer`) together with the LightGBM/XGBoost classifier in a single artifact (`models/fraud_pipeline.joblib`) ensures Phase 3 API scoring receives identical feature transformations without schema drift. | Separate scaler and model pickles (risks desynchronization and scoring silent errors). |
