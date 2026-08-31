@@ -194,20 +194,25 @@ def score_with_ragas(generations: list[dict]) -> dict:
     if not scored:
         return {"faithfulness": None, "answer_relevancy": None, "context_precision": None}
 
-    ds = Dataset.from_dict(
-        {
-            "question": [g["question"] for g in scored],
-            "answer": [g["answer"] for g in scored],
-            "contexts": [g["contexts"] for g in scored],
-            "ground_truth": [g["ground_truth"] for g in scored],
+    try:
+        ds = Dataset.from_dict(
+            {
+                "question": [g["question"] for g in scored],
+                "answer": [g["answer"] for g in scored],
+                "contexts": [g["contexts"] for g in scored],
+                "ground_truth": [g["ground_truth"] for g in scored],
+            }
+        )
+        scores = ragas_evaluate(ds, metrics=[faithfulness, answer_relevancy, context_precision])
+        return {
+            "faithfulness": float(scores["faithfulness"]) if "faithfulness" in scores else None,
+            "answer_relevancy": float(scores["answer_relevancy"]) if "answer_relevancy" in scores else None,
+            "context_precision": float(scores["context_precision"]) if "context_precision" in scores else None,
         }
-    )
-    scores = ragas_evaluate(ds, metrics=[faithfulness, answer_relevancy, context_precision])
-    return {
-        "faithfulness": float(scores["faithfulness"]),
-        "answer_relevancy": float(scores["answer_relevancy"]),
-        "context_precision": float(scores["context_precision"]),
-    }
+    except Exception as e:
+        print(f"  (ragas evaluation skipped: {e})")
+        return {"faithfulness": None, "answer_relevancy": None, "context_precision": None}
+
 
 
 def to_markdown(rows: list[dict]) -> str:
