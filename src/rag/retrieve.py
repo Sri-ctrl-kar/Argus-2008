@@ -222,7 +222,8 @@ class RAGRetriever:
                 c.chunk_id: c for c, _ in (dense_res + bm25_res)
             }
 
-            fused_ids = reciprocal_rank_fusion([dense_ids, bm25_ids], k=60, weights=[1.0, 0.5])
+            fused_ids = reciprocal_rank_fusion([dense_ids, bm25_ids], k=60)
+
 
             initial_chunks = [chunk_map[cid] for cid in fused_ids if cid in chunk_map]
             initial_scores = [1.0 / (idx + 1) for idx in range(len(initial_chunks))]
