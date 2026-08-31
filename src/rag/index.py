@@ -211,7 +211,9 @@ def build_and_save_all_indices() -> Dict[str, Any]:
 
     indices = {}
     for strategy, chunks in chunk_data.items():
+        chunks = [c for c in chunks if len(c.text.strip()) >= 50]
         logger.info("Indexing strategy: %s (%d chunks)...", strategy, len(chunks))
+
 
         bm25_index = SparseBM25Index(chunks)
         bm25_path = CHROMA_PERSIST_DIR / f"bm25_{strategy}.pkl"

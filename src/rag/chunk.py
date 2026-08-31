@@ -174,7 +174,12 @@ def generate_all_chunks() -> Dict[str, List[DocumentChunk]]:
         fixed_chunks.extend(fixed_chunker.chunk_filing(f))
         section_chunks.extend(section_chunker.chunk_filing(f))
 
+    # Filter out empty or degenerate chunks shorter than 50 characters
+    fixed_chunks = [c for c in fixed_chunks if len(c.text.strip()) >= 50]
+    section_chunks = [c for c in section_chunks if len(c.text.strip()) >= 50]
+
     # Save to disk
+
     fixed_path = CHUNKS_DIR / "fixed_chunks.json"
     section_path = CHUNKS_DIR / "section_chunks.json"
 
