@@ -141,18 +141,24 @@ class CrossEncoderReranker:
         return scored[:top_k]
 
 
-def reciprocal_rank_fusion(rankings: List[List[str]], k: int = 60) -> List[str]:
+def reciprocal_rank_fusion(
+    rankings: List[List[str]],
+    k: int = 60,
+    weights: Optional[List[float]] = None,
+) -> List[str]:
     """Fuse rankings by rank position, not score.
 
     Raw BM25 and cosine scores are on incompatible scales -- summing them
     lets BM25's unbounded values swamp cosine's [0,1] range. RRF sidesteps
     the problem entirely by using only ordinal position.
     """
+    weights = weights or [1.0] * len(rankings)
     scores: Dict[str, float] = {}
-    for ranking in rankings:
+    for ranking, w in zip(rankings, weights):
         for rank, chunk_id in enumerate(ranking, start=1):
-            scores[chunk_id] = scores.get(chunk_id, 0.0) + 1.0 / (k + rank)
+            scores[chunk_id] = scores.get(chunk_id, 0.0) + w / (k + rank)
     return sorted(scores, key=scores.get, reverse=True)
+
 
 
 class RAGRetriever:
@@ -216,7 +222,8 @@ class RAGRetriever:
                 c.chunk_id: c for c, _ in (dense_res + bm25_res)
             }
 
-            fused_ids = reciprocal_rank_fusion([dense_ids, bm25_ids], k=60)
+            fused_ids = reciprocal_rank_fusion([dense_ids, bm25_ids], k=60, weights=[1.0, 0.5])
+
             initial_chunks = [chunk_map[cid] for cid in fused_ids if cid in chunk_map]
             initial_scores = [1.0 / (idx + 1) for idx in range(len(initial_chunks))]
 
