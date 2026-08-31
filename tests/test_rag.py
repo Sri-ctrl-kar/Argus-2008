@@ -137,3 +137,27 @@ def test_abstention_on_unanswerable_question():
 
     assert ans.abstained is True
     assert ABSTENTION_PHRASE in ans.response_text
+
+
+def test_metadata_year_matches_filing_content(sample_filings):
+    """
+    Test 6: The fiscal year in metadata must appear in the filing's own period statement.
+    """
+    import re
+    from bs4 import BeautifulSoup
+    from src.rag.config import FILINGS_RAW_DIR
+
+    for filing in sample_filings:
+        matches = list(FILINGS_RAW_DIR.glob(f"{filing.ticker}_10K_*.html"))
+        if matches:
+            txt = BeautifulSoup(matches[0].read_text(encoding="utf-8"), "lxml").get_text(" ", strip=True)
+            declared = filing.fiscal_year
+            match = re.search(
+                r"(?:fiscal\s+year\s+ended|for\s+the\s+(?:fiscal\s+)?(?:year|period)\s+ended)\s+\w+\s+\d{1,2},?\s+(\d{4})",
+                txt,
+                re.I,
+            )
+            assert match and match.group(1) == str(declared), (
+                f"Year mismatch for {filing.ticker}: declared {declared} vs found {match.group(1) if match else None}"
+            )
+

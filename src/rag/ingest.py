@@ -235,11 +235,21 @@ def build_curated_10k_corpus() -> List[ParsedFiling]:
         matches = list(FILINGS_RAW_DIR.glob(f"{ticker}_10K_*.html"))
         if matches:
             filing_path = matches[0]
-            m_year = re.search(r"_(\d{4})\.html$", filing_path.name)
-            fiscal_year = int(m_year.group(1)) if m_year else 2023
-
             html_text = filing_path.read_text(encoding="utf-8")
             clean_text = BeautifulSoup(html_text, "lxml").get_text(" ", strip=True)
+
+            # Extract declared fiscal year directly from filing period statement
+            m_period = re.search(
+                r"(?:fiscal\s+year\s+ended|for\s+the\s+(?:fiscal\s+)?(?:year|period)\s+ended)\s+[A-Za-z]+\s+\d{1,2},?\s+(\d{4})",
+                clean_text,
+                re.I,
+            )
+            if m_period:
+                fiscal_year = int(m_period.group(1))
+            else:
+                m_year = re.search(r"_(\d{4})\.html$", filing_path.name)
+                fiscal_year = int(m_year.group(1)) if m_year else 2023
+
 
             all_positions = []
             for k, pat_list in patterns.items():
