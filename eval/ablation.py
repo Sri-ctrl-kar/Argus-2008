@@ -21,11 +21,13 @@ from pathlib import Path
 # ===========================================================================
 
 CONFIGS = {
+    "bm25_only": "BM25 only (diagnostic)",
     "fixed_dense": "Fixed chunks + dense",
     "section_dense": "Section chunks + dense",
     "section_hybrid": "Section chunks + hybrid (BM25 + dense)",
     "section_hybrid_rerank": "Section chunks + hybrid + rerank",
 }
+
 
 K_VALUES = (1, 3, 5)
 
