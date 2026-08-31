@@ -1,0 +1,27 @@
+{
+  "identical_configs": 0,
+  "mean_question_answer_overlap": 0.04583333333333333,
+  "recall_at_k": {
+    "1": {
+      "fixed_dense": 1.0,
+      "section_dense": 1.0,
+      "section_hybrid": 1.0,
+      "section_hybrid_rerank": 1.0
+    },
+    "3": {
+      "fixed_dense": 1.0,
+      "section_dense": 1.0,
+      "section_hybrid": 1.0,
+      "section_hybrid_rerank": 1.0
+    },
+    "5": {
+      "fixed_dense": 1.0,
+      "section_dense": 1.0,
+      "section_hybrid": 1.0,
+      "section_hybrid_rerank": 1.0
+    }
+  },
+  "corpus": {
+    "n_chunks": 45
+  }
+}

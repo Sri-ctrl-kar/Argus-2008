@@ -46,7 +46,12 @@ class RetrievalResult:
     rank: int
     retrieval_method: str
 
+    @property
+    def chunk_id(self) -> str:
+        return self.chunk.chunk_id
+
     def to_dict(self) -> Dict[str, Any]:
+
         return {
             "chunk_id": self.chunk.chunk_id,
             "ticker": self.chunk.ticker,
@@ -160,15 +165,16 @@ class RAGRetriever:
         self.bm25_index = SparseBM25Index.load(bm25_path)
         self.reranker = CrossEncoderReranker() if use_reranker else None
 
-    def retrieve(self, query: str) -> List[RetrievalResult]:
+    def retrieve(self, query: str, k: Optional[int] = None) -> List[RetrievalResult]:
         """
         Executes query retrieval through configured pipeline.
         """
+        effective_k = k if k is not None else self.top_k
         filter_ticker = extract_metadata_filter(query) if self.use_metadata_filtering else None
 
         if not self.use_hybrid:
             # 1. Pure Dense Retrieval
-            candidates = self.dense_index.search(query, top_k=DENSE_TOP_K if self.use_reranker else self.top_k, filter_ticker=filter_ticker)
+            candidates = self.dense_index.search(query, top_k=DENSE_TOP_K if self.use_reranker else effective_k, filter_ticker=filter_ticker)
             initial_chunks = [c for c, _ in candidates]
             initial_scores = [s for _, s in candidates]
         else:
@@ -197,13 +203,13 @@ class RAGRetriever:
 
         # 3. Optional Reranking Step
         if self.use_reranker and self.reranker is not None and initial_chunks:
-            reranked = self.reranker.rerank(query, initial_chunks[:20], top_k=self.top_k)
+            reranked = self.reranker.rerank(query, initial_chunks[:20], top_k=effective_k)
             final_chunks = [c for c, _ in reranked]
             final_scores = [s for _, s in reranked]
             method = f"{self.strategy}_hybrid_rerank" if self.use_hybrid else f"{self.strategy}_dense_rerank"
         else:
-            final_chunks = initial_chunks[: self.top_k]
-            final_scores = initial_scores[: self.top_k]
+            final_chunks = initial_chunks[: effective_k]
+            final_scores = initial_scores[: effective_k]
             method = f"{self.strategy}_hybrid" if self.use_hybrid else f"{self.strategy}_dense"
 
         results: List[RetrievalResult] = []
@@ -218,6 +224,21 @@ class RAGRetriever:
             )
 
         return results
+
+
+def build(config_name: str) -> RAGRetriever:
+    """
+    Factory function for standard RAG retriever configurations.
+    """
+    mapping = {
+        "fixed_dense": {"strategy": "fixed", "use_hybrid": False, "use_reranker": False},
+        "section_dense": {"strategy": "section_aware", "use_hybrid": False, "use_reranker": False},
+        "section_hybrid": {"strategy": "section_aware", "use_hybrid": True, "use_reranker": False},
+        "section_hybrid_rerank": {"strategy": "section_aware", "use_hybrid": True, "use_reranker": True},
+    }
+    kwargs = mapping.get(config_name, {"strategy": "section_aware", "use_hybrid": True, "use_reranker": True})
+    return RAGRetriever(**kwargs)
+
 
 
 if __name__ == "__main__":

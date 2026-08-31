@@ -120,10 +120,21 @@ class SectionAwareChunker:
             # Prepend contextual header
             header = f"[{filing.ticker} ({filing.company_name}) 10-K FY{filing.fiscal_year} | {sec_title}]\n"
 
-            # Split section by paragraphs
-            paragraphs = [p.strip() for p in sec_text.split("\n\n") if p.strip()]
+            # Split section by paragraphs or bullet items
+            raw_lines = [p.strip() for p in sec_text.split("\n") if p.strip()]
+            paragraphs = []
+            for line in raw_lines:
+                if len(line.split()) > self.max_tokens:
+                    # Sub-split long lines
+                    words = line.split()
+                    for j in range(0, len(words), self.max_tokens):
+                        paragraphs.append(" ".join(words[j : j + self.max_tokens]))
+                else:
+                    paragraphs.append(line)
+
             current_buffer: List[str] = []
             current_token_count = 0
+
 
             for para in paragraphs:
                 para_tokens = count_tokens(para)

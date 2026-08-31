@@ -173,6 +173,9 @@ class DenseVectorIndex:
         with open(filepath, "wb") as f:
             pickle.dump(data, f)
 
+    def count(self) -> int:
+        return len(self.chunks)
+
     @classmethod
     def load(cls, filepath: Path) -> "DenseVectorIndex":
         with open(filepath, "rb") as f:
@@ -180,6 +183,15 @@ class DenseVectorIndex:
         chunks = [DocumentChunk(**c) for c in data["chunks"]]
         instance = cls(chunks=chunks, model_name=data["model_name"], embeddings=data["embeddings"])
         return instance
+
+
+def load(strategy: str = "section_aware") -> DenseVectorIndex:
+    """Convenience helper to load precomputed vector index."""
+    filepath = CHROMA_PERSIST_DIR / f"dense_{strategy}.pkl"
+    if not filepath.exists():
+        build_and_save_all_indices()
+    return DenseVectorIndex.load(filepath)
+
 
 
 
