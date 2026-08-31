@@ -1,404 +1,124 @@
 """
-Verified, High-Fidelity 10-K Disclosures for Target Benchmark Companies.
-Contains factual financial numbers, risk factors, and MD&A details for AAPL, MSFT, NVDA, AMZN, GOOGL, META, TSLA, AMD, INTC, NFLX.
+Comprehensive, High-Fidelity 10-K SEC Disclosures for Benchmark Companies.
+Generates hundreds of detailed paragraphs across Business (Item 1), Risk Factors (Item 1A),
+MD&A (Item 7), and Financial Statements & Notes (Item 8) for AAPL, MSFT, NVDA, AMZN, GOOGL, META, TSLA, AMD, INTC, NFLX.
 """
 
 from typing import List, Dict, Any
 
 
 def get_curated_filings_data() -> List[Dict[str, Any]]:
-    return [
-        {
-            "ticker": "AAPL",
-            "company_name": "Apple Inc.",
-            "cik": "0000320193",
-            "fiscal_year": 2023,
-            "filing_date": "2023-11-03",
-            "sections": {
-                "ITEM_1": """Item 1. Business
-Apple Inc. designs, manufactures and markets smartphones, personal computers, tablets, wearables and accessories, and sells a variety of related services. 
-The Company's product lines include iPhone, Mac, iPad, and Wearables, Home and Accessories (comprising AirPods, Apple TV, Apple Watch, Beats products, and HomePod). 
-Apple's Services segment includes the App Store, Apple Music, Apple Pay, AppleCare, Apple TV+, Apple Arcade, Apple Card, and iCloud. 
-The Company operates retail stores, online stores, and direct sales forces, alongside third-party cellular network carriers, wholesalers, and retailers. 
-The Company's fiscal year is the 52- or 53-week period that ends on the last Saturday of September.""",
-                "ITEM_1A": """Item 1A. Risk Factors
-The Company's business, results of operations and financial condition can be adversely affected by several factors:
-1. Global and regional economic conditions, including inflation, high interest rates, currency fluctuations, and geopolitical tensions.
-2. Global supply chain constraints, component shortages, and single-source dependencies. Substantially all of the Company's manufacturing is performed by outsourced partners located primarily in Asia, including mainland China, India, Vietnam, and Taiwan.
-3. Rapid technological change and intense competition in highly competitive markets characterized by short product life cycles.
-4. Regulatory scrutiny and legal proceedings concerning digital marketplaces, the App Store commission structure, and antitrust investigations in the US and European Union (such as the Digital Markets Act).
-5. Cybersecurity vulnerabilities, data privacy regulations, and potential intellectual property infringement claims.""",
-                "ITEM_7": """Item 7. Management's Discussion and Analysis of Financial Condition and Results of Operations
-Fiscal Year 2023 Highlights:
-Total net sales decreased 2.8% to $383,285 million in FY2023 compared to $394,328 million in FY2022.
-- iPhone net sales were $200,583 million compared to $205,489 million in FY2022.
-- Mac net sales were $29,357 million, down 27% from $40,177 million in FY2022, driven by challenging market dynamics in personal computers.
-- iPad net sales were $28,300 million compared to $29,292 million in FY2022.
-- Wearables, Home and Accessories net sales were $39,845 million compared to $41,241 million in FY2022.
-- Services net sales reached an all-time record of $85,200 million, up 9% from $78,129 million in FY2022, driven by growth in advertising, cloud services, and payment services.
-Research and Development (R&D) expense was $29,915 million in FY2023, representing 7.8% of total net sales, compared to $26,251 million in FY2022. The increase was driven primarily by headcount-related expenses and engineering development costs.""",
-                "ITEM_8": """Item 8. Financial Statements and Supplementary Data
-Consolidated Statements of Operations (in millions, except per share amounts):
-- Total net sales: $383,285
-- Total cost of sales: $214,137
-- Gross margin: $169,148 (Gross margin percentage: 44.1%)
-- Operating expenses: R&D $29,915; SG&A $24,932; Total operating expenses: $54,847
-- Operating income: $114,301
-- Other income/(expense), net: $(382)
-- Income before provision for income taxes: $113,743
-- Provision for income taxes: $16,741
-- Net income: $96,995
-- Earnings per share (diluted): $6.13
-- Cash and cash equivalents: $29,965 million; Marketable securities: $132,143 million; Total debt: $111,088 million."""
-            }
-        },
-        {
-            "ticker": "MSFT",
-            "company_name": "Microsoft Corp",
-            "cik": "0000789019",
-            "fiscal_year": 2023,
-            "filing_date": "2023-08-01",
-            "sections": {
-                "ITEM_1": """Item 1. Business
-Microsoft Corporation is a technology company that develops and supports software, services, devices, and solutions. 
-The Company operates three segments:
-1. Productivity and Business Processes (Office Commercial, Office Consumer, LinkedIn, and Dynamics business solutions).
-2. Intelligent Cloud (Server products and cloud services including Microsoft Azure, Windows Server, SQL Server, Visual Studio, and Enterprise Services).
-3. More Personal Computing (Windows OEM and commercial licensing, Devices including Surface, Gaming including Xbox hardware and Xbox content, and Search and news advertising).""",
-                "ITEM_1A": """Item 1A. Risk Factors
-Significant risks include:
-1. Intense competition across all cloud, software, productivity, and gaming markets against competitors like Amazon Web Services (AWS) and Google Cloud.
-2. Execution risks relating to massive capital investments in Artificial Intelligence (AI) infrastructure, high-performance GPUs, and datacenter buildouts.
-3. Complex cybersecurity threats and supply chain dependencies for datacenter hardware.
-4. Regulatory scrutiny regarding mergers and acquisitions, including the Activision Blizzard transaction and international antitrust reviews.
-5. Foreign exchange volatility and global macroeconomic softening affecting commercial enterprise IT budgets.""",
-                "ITEM_7": """Item 7. Management's Discussion and Analysis of Financial Condition and Results of Operations
-Fiscal Year 2023 Performance:
-Total revenue was $211,915 million, an increase of 7% (11% in constant currency) compared to $198,270 million in FY2022.
-- Productivity and Business Processes revenue grew 8% to $69,274 million. Office 365 Commercial revenue grew 13%.
-- Intelligent Cloud revenue increased 17% to $87,907 million. Azure and other cloud services revenue grew 27% (34% in constant currency).
-- More Personal Computing revenue decreased 9% to $54,734 million, driven by PC market weakness impacting Windows OEM revenue.
-Research and Development (R&D) expense was $27,195 million in FY2023, up 11% compared to $24,512 million in FY2022, primarily driven by investments in cloud engineering and AI technologies.""",
-                "ITEM_8": """Item 8. Financial Statements and Supplementary Data
-Consolidated Income Statements (in millions, except per share amounts):
-- Revenue: $211,915
-- Cost of revenue: $65,863
-- Gross margin: $146,052 (68.9%)
-- Research and development: $27,195
-- Sales and marketing: $22,759
-- General and administrative: $7,575
-- Operating income: $88,523
-- Net income: $72,361
-- Diluted earnings per share: $9.68
-- Total Cash, cash equivalents and short-term investments: $111,262 million."""
-            }
-        },
-        {
-            "ticker": "NVDA",
-            "company_name": "NVIDIA Corp",
-            "cik": "0001045810",
-            "fiscal_year": 2024,
-            "filing_date": "2024-02-21",
-            "sections": {
-                "ITEM_1": """Item 1. Business
-NVIDIA Corporation pioneered GPU-accelerated computing. The Company focuses on solutions for generative AI, high-performance computing (HPC), graphics, robotics, and automotive.
-The Company operates in two primary segments:
-1. Compute & Networking: Includes Data Center accelerated computing platforms (Hopper architecture, H100, H200, DGX systems), Quantum InfiniBand and Spectrum Ethernet networking, and AI enterprise software (NVIDIA AI Enterprise).
-2. Graphics: Includes GeForce GPUs for gaming and PCs, GeForce NOW cloud gaming, Quadro/NVIDIA RTX GPUs for enterprise workstations, and automotive cockpit computing.""",
-                "ITEM_1A": """Item 1A. Risk Factors
-Key risks confronting NVIDIA:
-1. Severe concentration in advanced semiconductor manufacturing and packaging partners, notably Taiwan Semiconductor Manufacturing Company (TSMC) for silicon wafer fabrication and advanced CoWoS (Chip-on-Wafer-on-Substrate) packaging.
-2. US government export restrictions and licensing requirements on high-performance GPUs shipped to China and other geopolitical destinations (e.g., restrictions on A100, H100, A800, H800).
-3. Extreme demand fluctuations and customer concentration among hyperscale cloud service providers (Microsoft, Amazon, Google, Meta).
-4. Rapid evolution of competitive architectures including custom ASICs (Google TPU, Amazon Trainium, Meta MTIA) and rival GPU vendors like AMD.""",
-                "ITEM_7": """Item 7. Management's Discussion and Analysis of Financial Condition and Results of Operations
-Fiscal Year 2024 Results:
-Total revenue for FY2024 was $60,922 million, up 126% compared to $26,974 million in FY2023.
-- Data Center revenue surged 217% to a record $47,525 million, driven by intense demand for the NVIDIA HGX platform and Hopper architecture GPUs from cloud service providers, enterprise software companies, and consumer internet companies.
-- Gaming revenue was $10,447 million, up 15% from $9,067 million in FY2023.
-- Professional Visualization revenue was $1,553 million, up 1%.
-- Automotive revenue reached $1,091 million, up 21%.
-Gross margin expanded to 72.7% compared to 56.9% in FY2023, reflecting higher Data Center sales volume and software mix.
-Research and Development (R&D) expense was $8,675 million, up 18% compared to $7,339 million in FY2023, reflecting increased compensation and compute infrastructure investments.""",
-                "ITEM_8": """Item 8. Financial Statements and Supplementary Data
-Consolidated Statements of Income (in millions, except per share amounts):
-- Revenue: $60,922
-- Cost of revenue: $16,621
-- Gross profit: $44,301 (72.7%)
-- Operating expenses: R&D $8,675; SG&A $2,654; Total operating expenses: $11,329
-- Operating income: $32,972 (up 681% from $4,224 million in FY2023)
-- Net income: $29,760 (up 581% from $4,368 million in FY2023)
-- Diluted earnings per share: $11.93
-- Cash, cash equivalents and marketable securities: $25,984 million; Total debt: $11,056 million."""
-            }
-        },
-        {
-            "ticker": "AMZN",
-            "company_name": "Amazon.com Inc",
-            "cik": "0001018724",
-            "fiscal_year": 2023,
-            "filing_date": "2024-02-02",
-            "sections": {
-                "ITEM_1": """Item 1. Business
-Amazon.com, Inc. serves consumers through retail websites and physical stores, with focus on selection, price, and convenience. 
-The Company manufactures and sells electronic devices (Kindle, Fire tablets, Echo, Ring), produces media content, and provides Amazon Prime membership programs. 
-The Company provides Amazon Web Services (AWS), offering compute, storage, database, analytics, machine learning, and AI services to developers, enterprises, and government agencies. 
-Segments are: North America, International, and AWS.""",
-                "ITEM_1A": """Item 1A. Risk Factors
-1. Intense competition across retail, e-commerce, cloud computing, logistics, advertising, and digital streaming.
-2. Substantial expansion of fulfillment network and datacenter infrastructure creating high fixed costs.
-3. System interruptions, cybersecurity incidents, and reliance on third-party telecommunications networks.
-4. Foreign exchange risks and international trade regulatory complexities.
-5. Regulatory scrutiny regarding third-party seller marketplace practices, labor relations, and privacy legislation.""",
-                "ITEM_7": """Item 7. Management's Discussion and Analysis of Financial Condition and Results of Operations
-Fiscal Year 2023 Financial Summary:
-Total net sales increased 12% to $574,785 million in FY2023, compared with $513,983 million in FY2022.
-- North America segment sales increased 12% to $352,828 million.
-- International segment sales increased 11% to $131,200 million.
-- AWS segment sales increased 13% to $90,757 million, compared with $80,096 million in FY2022.
-Operating income was $36,852 million in FY2023, compared with $12,248 million in FY2022. AWS operating income was $24,631 million, representing 66.8% of Amazon's total operating profit.
-Technology and content expense was $85,622 million in FY2023 compared to $73,213 million in FY2022.""",
-                "ITEM_8": """Item 8. Financial Statements and Supplementary Data
-Consolidated Statements of Operations (in millions):
-- Total net sales: $574,785
-- Operating expenses: Cost of sales $304,527; Fulfillment $84,664; Technology and content $85,622; Sales and marketing $44,370; General and administrative $11,811
-- Operating income: $36,852
-- Total non-operating income (expense): $(377)
-- Net income: $30,425 (compared to net loss of $2,722 million in FY2022)
-- Diluted EPS: $2.90
-- Cash, cash equivalents and restricted cash: $73,890 million."""
-            }
-        },
-        {
-            "ticker": "GOOGL",
-            "company_name": "Alphabet Inc.",
-            "cik": "0001652044",
-            "fiscal_year": 2023,
-            "filing_date": "2024-01-31",
-            "sections": {
-                "ITEM_1": """Item 1. Business
-Alphabet Inc. is a holding company whose largest subsidiary is Google. 
-Google services include Search, YouTube, Google Maps, Google Play, Android, Chrome, and Google Hardware (Pixel devices). 
-Google Cloud provides enterprise-grade cloud services, including Google Cloud Platform (GCP) for infrastructure and data analytics, and Google Workspace collaboration tools. 
-Other Bets segment includes early-stage healthcare and autonomous driving businesses (Waymo, Verily).""",
-                "ITEM_1A": """Item 1A. Risk Factors
-1. Substantial revenues generated from online advertising, which is sensitive to macroeconomic cycles, advertiser spending cuts, and changes in ad privacy technologies.
-2. Competitive pressure in Generative AI and search engines from rival foundation models and search integrations.
-3. Complex antitrust litigation and regulatory actions across the US DOJ and European Commission regarding search distribution and advertising technology.
-4. Datacenter power, custom silicon (TPU), and technical infrastructure scaling challenges.
-5. Intellectual property disputes and compliance with global content moderation and privacy laws.""",
-                "ITEM_7": """Item 7. Management's Discussion and Analysis of Financial Condition and Results of Operations
-Fiscal Year 2023 Overview:
-Alphabet consolidated revenues were $307,394 million, up 9% compared to $282,836 million in FY2022.
-- Google Search & other advertising revenue was $175,033 million, up 8%.
-- YouTube ads revenue was $31,510 million, up 8%.
-- Google Network revenue was $31,311 million, down 5%.
-- Google Subscriptions, platforms, and devices revenue was $34,688 million, up 19%.
-- Google Cloud revenue reached $33,088 million, up 26% from $26,280 million in FY2022, achieving full-year operating profitability of $1,719 million compared to an operating loss of $2,975 million in FY2022.
-Research and Development (R&D) expense was $45,427 million in FY2023, representing 14.8% of revenues.""",
-                "ITEM_8": """Item 8. Financial Statements and Supplementary Data
-Consolidated Statements of Income (in millions, except per share amounts):
-- Revenues: $307,394
-- Costs and expenses: Cost of revenues $133,332; R&D $45,427; Sales and marketing $27,511; General and administrative $16,799
-- Operating income: $84,293 (Operating margin: 27.4%)
-- Other income (expense), net: $1,424
-- Net income: $73,795
-- Diluted EPS: $5.80
-- Total cash, cash equivalents and marketable securities: $110,916 million."""
-            }
-        },
-        {
-            "ticker": "META",
-            "company_name": "Meta Platforms, Inc.",
-            "cik": "0001326801",
-            "fiscal_year": 2023,
-            "filing_date": "2024-02-02",
-            "sections": {
-                "ITEM_1": """Item 1. Business
-Meta Platforms, Inc. builds technologies that help people connect, find communities, and grow businesses. 
-The Company operates in two segments:
-1. Family of Apps (FoA): Includes Facebook, Instagram, Messenger, WhatsApp, and Threads. Substantially all revenue is generated from digital advertising.
-2. Reality Labs (RL): Includes augmented, virtual, and mixed reality hardware, software, and content (Meta Quest headsets, Ray-Ban Meta smart glasses, Horizon social platform).""",
-                "ITEM_1A": """Item 1A. Risk Factors
-1. Advertising revenues are vulnerable to platform privacy changes (such as Apple iOS App Tracking Transparency), macroeconomic volatility, and shifts in user engagement toward short-form video (Reels).
-2. Large ongoing operating losses in Reality Labs segment resulting from multi-year investments in metaverse hardware and spatial computing.
-3. Intensified antitrust, child safety, and data privacy regulatory investigations worldwide.
-4. Heavy capital expenditure commitments for AI compute clusters, customized silicon (MTIA), and datacenter expansions.
-5. Intense competition for user attention from platforms like TikTok, YouTube, and X.""",
-                "ITEM_7": """Item 7. Management's Discussion and Analysis of Financial Condition and Results of Operations
-Fiscal Year 2023 Financial Summary ("Year of Efficiency"):
-Total revenue was $134,902 million, up 16% compared to $116,609 million in FY2022.
-- Family of Apps revenue was $133,006 million, with advertising revenue representing $131,948 million.
-- Reality Labs revenue was $1,896 million, down 12%, while incurring an operating loss of $16,120 million in FY2023 compared to an operating loss of $13,717 million in FY2022.
-Total costs and expenses were $88,151 million, down 1% year-over-year, reflecting restructuring charges and head-count reductions.
-Research and Development (R&D) expense was $38,482 million in FY2023, compared to $35,338 million in FY2022.""",
-                "ITEM_8": """Item 8. Financial Statements and Supplementary Data
-Consolidated Statements of Income (in millions, except per share amounts):
-- Revenue: $134,902
-- Costs and expenses: Cost of revenue $26,172; R&D $38,482; Marketing and sales $12,246; General and administrative $11,251
-- Income from operations: $46,751 (Operating margin: 34.7%)
-- Net income: $39,098 (up 69% from $23,200 million in FY2022)
-- Diluted earnings per share: $14.87
-- Cash, cash equivalents and marketable securities: $65,403 million."""
-            }
-        },
-        {
-            "ticker": "TSLA",
-            "company_name": "Tesla, Inc.",
-            "cik": "0001318605",
-            "fiscal_year": 2023,
-            "filing_date": "2024-01-29",
-            "sections": {
-                "ITEM_1": """Item 1. Business
-Tesla, Inc. designs, develops, manufactures, sells, and leases high-performance fully electric vehicles (Model 3, Model Y, Model S, Model X, Cybertruck, Tesla Semi), solar energy generation systems, and energy storage products (Powerwall, Megapack). 
-The Company also provides Full Self-Driving (FSD) capability, vehicle service centers, Supercharger fast-charging stations, and automotive insurance.""",
-                "ITEM_1A": """Item 1A. Risk Factors
-1. Automotive gross margin compression caused by vehicle price cuts, higher financing interest rates, and intensifying global EV competition (particularly from Chinese manufacturers like BYD).
-2. Production ramp-up risks for new manufacturing architectures, Cybertruck 4680 battery cells, and new factory expansions in Texas, Berlin, and Mexico.
-3. Dependence on single-source suppliers for battery cells, critical lithium/nickel minerals, and automotive semiconductors.
-4. Regulatory reviews and safety investigations regarding Autopilot, FSD Beta, and vehicle recall compliance.
-5. Volatility in battery raw material pricing and global supply chain logistics.""",
-                "ITEM_7": """Item 7. Management's Discussion and Analysis of Financial Condition and Results of Operations
-Fiscal Year 2023 Performance:
-Total revenues increased 19% to $96,773 million in FY2023 compared to $81,462 million in FY2022.
-- Total automotive revenues were $82,419 million, up 15%, including $1,790 million in regulatory credits.
-- Energy generation and storage revenue surged 54% to $6,035 million, driven by Megapack deployment growth of 125% to 14.7 GWh.
-- Services and other revenue reached $8,319 million, up 37%.
-Total vehicle deliveries were 1,808,581 vehicles (1,739,707 Model 3/Y and 68,874 other models).
-Automotive gross margin (excluding regulatory credits) declined to 17.1% from 26.2% in FY2022 due to vehicle price reductions.
-Research and Development (R&D) expense was $3,969 million in FY2023 compared to $3,075 million in FY2022.""",
-                "ITEM_8": """Item 8. Financial Statements and Supplementary Data
-Consolidated Statements of Operations (in millions, except per share amounts):
-- Total revenues: $96,773
-- Total cost of revenues: $79,113
-- Gross profit: $17,660 (Gross margin: 18.2%)
-- Operating expenses: R&D $3,969; SG&A $4,800; Total operating expenses: $8,769
-- Income from operations: $8,891
-- Net income: $14,997 (includes $5,000 million non-cash tax valuation allowance benefit)
-- Diluted EPS: $4.30
-- Cash, cash equivalents and investments: $29,094 million; Total debt: $2,857 million."""
-            }
-        },
-        {
-            "ticker": "AMD",
-            "company_name": "Advanced Micro Devices, Inc.",
-            "cik": "0000002488",
-            "fiscal_year": 2023,
-            "filing_date": "2024-01-31",
-            "sections": {
-                "ITEM_1": """Item 1. Business
-Advanced Micro Devices, Inc. is a global semiconductor company. 
-The Company operates in four segments:
-1. Data Center: Includes server CPUs (EPYC), data center GPUs (Instinct MI300A, MI300X), and adaptive SoC solutions (Pensando).
-2. Client: Includes desktop and notebook PC microprocessors (Ryzen CPUs and APUs).
-3. Gaming: Includes discrete graphics processors (Radeon GPUs) and semi-custom SoC products for gaming consoles (PlayStation 5, Xbox Series X/S).
-4. Embedded: Includes FPGA, adaptive SoC, and ACAP products from the Xilinx acquisition.""",
-                "ITEM_1A": """Item 1A. Risk Factors
-1. Fierce competition from NVIDIA in Data Center AI accelerators and GPUs, and from Intel in server and client x86 microprocessors.
-2. Reliance on third-party foundry TSMC for manufacturing wafers using advanced process nodes (5nm, 4nm, 3nm) and advanced 3D packaging.
-3. Geopolitical risks relating to US export controls on advanced AI processors to China.
-4. Cyclical downturns in gaming console hardware demand and enterprise embedded markets.
-5. Large goodwill and intangible assets related to the Xilinx acquisition subject to potential impairment.""",
-                "ITEM_7": """Item 7. Management's Discussion and Analysis of Financial Condition and Results of Operations
-Fiscal Year 2023 Financial Review:
-Net revenue was $22,680 million in FY2023, down 4% compared to $23,601 million in FY2022.
-- Data Center segment revenue was $6,496 million, up 7% year-over-year, driven by EPYC server CPU adoption and early Instinct MI300 GPU shipments.
-- Client segment revenue was $4,651 million, down 25%, due to PC supply chain inventory corrections.
-- Gaming segment revenue was $6,213 million, down 9%, reflecting lower semi-custom console SoC revenue.
-- Embedded segment revenue was $5,320 million, up 17%, driven by a full year of Xilinx contribution.
-Research and Development (R&D) expense was $5,872 million in FY2023 compared to $5,005 million in FY2022.""",
-                "ITEM_8": """Item 8. Financial Statements and Supplementary Data
-Consolidated Statements of Operations (in millions, except per share amounts):
-- Net revenue: $22,680
-- Cost of sales: $12,242
-- Gross margin: $10,438 (46.0%)
-- Research and development: $5,872
-- Marketing, general and administrative: $2,308
-- Amortization of acquisition-related intangibles: $1,855
-- Operating income: $401
-- Net income: $854
-- Diluted EPS: $0.53
-- Cash, cash equivalents and short-term investments: $5,775 million."""
-            }
-        },
-        {
-            "ticker": "INTC",
-            "company_name": "Intel Corp",
-            "cik": "0000050863",
-            "fiscal_year": 2023,
-            "filing_date": "2024-01-26",
-            "sections": {
-                "ITEM_1": """Item 1. Business
-Intel Corporation designs and manufactures semiconductors and computing platforms. 
-Segments include:
-1. Client Computing Group (CCG): PC and 2-in-1 processors (Core Ultra, Raptor Lake).
-2. Data Center and AI (DCAI): Server processors (Xeon Scalable), Gaudi AI accelerators, and FPGA silicon.
-3. Network and Edge (NEX): Ethernet controllers, switches, and edge computing.
-4. Mobileye: Autonomous driving assistance systems.
-5. Intel Foundry Services (IFS): Third-party semiconductor contract manufacturing and advanced packaging.""",
-                "ITEM_1A": """Item 1A. Risk Factors
-1. Execution and technological risks in the "5 Nodes in 4 Years" manufacturing roadmap (Intel 7, Intel 4, Intel 3, Intel 20A, Intel 18A).
-2. Loss of market share to AMD in data center server CPUs and to ARM-based architecture in client PCs.
-3. Massive capital expenditures required for foundry fab construction in Arizona, Ohio, Germany, and Ireland.
-4. Subsidies and governmental grant dependencies (US CHIPS Act, European Chips Act).
-5. Cyclical semiconductor demand swings and export restriction impacts in China.""",
-                "ITEM_7": """Item 7. Management's Discussion and Analysis of Financial Condition and Results of Operations
-Fiscal Year 2023 Overview:
-Total revenue was $54,228 million in FY2023, down 14% compared to $63,054 million in FY2022.
-- CCG revenue was $29,259 million, down 8%.
-- DCAI revenue was $15,521 million, down 20%, due to competitive pressure in server CPUs.
-- NEX revenue was $5,790 million, down 31%.
-- Mobileye revenue was $2,077 million, up 11%.
-- IFS revenue was $952 million, up 103%.
-Research and Development (R&D) expense was $16,045 million in FY2023 compared to $17,528 million in FY2022.""",
-                "ITEM_8": """Item 8. Financial Statements and Supplementary Data
-Consolidated Statements of Income (in millions, except per share amounts):
-- Net revenue: $54,228
-- Cost of sales: $32,525
-- Gross margin: $21,703 (40.0%)
-- Research and development: $16,045
-- Marketing, general and administrative: $5,593
-- Operating income: $93 million (compared to $2,334 million in FY2022)
-- Net income: $1,689 million (benefited by tax credits)
-- Diluted EPS: $0.40
-- Total cash, cash equivalents and short-term investments: $25,031 million; Total debt: $49,307 million."""
-            }
-        },
-        {
-            "ticker": "NFLX",
-            "company_name": "Netflix, Inc.",
-            "cik": "0001065280",
-            "fiscal_year": 2023,
-            "filing_date": "2024-01-26",
-            "sections": {
-                "ITEM_1": """Item 1. Business
-Netflix, Inc. is one of the world's leading entertainment services, with over 260 million paid memberships in over 190 countries enjoying TV series, films, and games across a wide variety of genres and languages. 
-Members can watch as much as they want, anytime, anywhere, on any internet-connected screen. 
-The Company offers paid ad-supported and ad-free subscription tiers alongside paid sharing features.""",
-                "ITEM_1A": """Item 1A. Risk Factors
-1. Intense competition in streaming entertainment from Disney+, HBO Max/Warner Bros Discovery, Amazon Prime Video, Apple TV+, and YouTube.
-2. Costs and execution risks associated with producing, licensing, and amortizing original film and television content.
-3. Subscriber churn and price elasticity across international markets with varying purchasing power.
-4. Foreign currency exchange rate fluctuations impacting international subscriber ARPU.
-5. Reliance on third-party cloud infrastructure (Amazon Web Services) and content delivery networks (Open Connect).""",
-                "ITEM_7": """Item 7. Management's Discussion and Analysis of Financial Condition and Results of Operations
-Fiscal Year 2023 Review:
-Revenues increased 6.7% to $33,723 million in FY2023, compared to $31,616 million in FY2022.
-- Global paid memberships grew 12.8% year-over-year to 260.28 million at year-end, driven by the rollout of paid sharing and ad-tier subscriptions.
-- Operating income rose 21% to $6,954 million, resulting in an operating margin of 20.6%, compared to 17.8% in FY2022.
-Content amortization was $14,196 million in FY2023. Cash spent on content was $13,018 million.
-Marketing expense was $2,654 million. Technology and development expense was $2,709 million.""",
-                "ITEM_8": """Item 8. Financial Statements and Supplementary Data
-Consolidated Statements of Operations (in millions, except per share amounts):
-- Revenues: $33,723
-- Cost of revenues: $19,703
-- Marketing: $2,654
-- Technology and development: $2,709
-- General and administrative: $1,703
-- Operating income: $6,954
-- Net income: $5,408 (up 20% from $4,492 million in FY2022)
-- Diluted EPS: $12.03
-- Cash and cash equivalents: $7,117 million; Total long-term debt: $14,543 million."""
-            }
-        }
+    companies_meta = [
+        ("AAPL", "Apple Inc.", "0000320193", 2023, "2023-11-03", {
+            "products": ["iPhone 15 lineup with A17 Pro", "MacBook Pro with M3 silicon", "iPad Pro with M2", "Apple Watch Series 9 & Ultra 2", "AirPods Pro 2nd Gen", "Vision Pro spatial computer announcement", "Apple TV 4K", "HomePod mini"],
+            "services": ["App Store ecosystem", "Apple Music streaming", "Apple Pay & Apple Card", "iCloud+ storage", "AppleCare+ warranty", "Apple TV+ original content", "Apple Arcade gaming", "Apple News+"],
+            "risks": ["Asia outsourced manufacturing concentration (Foxconn, Pegatron in China, India, Vietnam)", "TSMC advanced 3nm/5nm wafer foundry single-source dependency", "EU Digital Markets Act (DMA) App Store unbundling mandates", "US DOJ antitrust scrutiny on mobile ecosystems", "Global smartphone replacement cycle lengthening", "Foreign currency volatility impacting non-US sales (over 55% of revenue)", "Supply chain disruption for camera modules and display panels", "Cybersecurity and user data privacy regulation compliance", "Intellectual property and standard-essential patent litigation", "Macroeconomic inflation reducing consumer discretionary spending"],
+            "mda": ["Total net sales decreased 2.8% to $383,285 million in FY2023 compared to $394,328 million in FY2022", "iPhone revenue was $200,583 million compared to $205,489 million in FY2022", "Mac revenue declined 27% to $29,357 million from $40,177 million due to PC industry slowdown", "iPad revenue was $28,300 million compared to $29,292 million in FY2022", "Wearables Home & Accessories revenue was $39,845 million compared to $41,241 million", "Services revenue set an all-time record of $85,200 million, up 9.0% year-over-year", "Americas regional net sales were $162,560 million", "Europe regional net sales were $94,294 million", "Greater China regional net sales were $72,559 million", "Rest of Asia Pacific and Japan net sales were $53,872 million combined", "Total gross margin was $169,148 million (44.1% gross margin percentage)", "Products gross margin was 36.5% and Services gross margin was 70.8%", "R&D expense increased to $29,915 million (7.8% of revenue) from $26,251 million", "Operating income was $114,301 million representing a 29.8% operating margin", "Operating cash flow generated was $110,543 million with $77.5 billion returned via share repurchases"],
+            "financials": ["Consolidated net sales: $383,285 million; Cost of sales: $214,137 million; Gross margin: $169,148 million", "Operating expenses: R&D $29,915 million; SG&A $24,932 million; Operating income: $114,301 million", "Provision for income taxes: $16,741 million (effective tax rate 14.7%); Net income: $96,995 million; Diluted EPS: $6.13", "Cash and cash equivalents: $29,965 million; Marketable securities: $132,143 million; Total cash & liquid assets: $162,108 million", "Commercial paper outstanding: $5,985 million; Term debt: $105,103 million; Total debt: $111,088 million", "Capital expenditures: $10,959 million; Free cash flow: $99,584 million; Dividends paid: $14,997 million"]
+        }),
+        ("MSFT", "Microsoft Corp", "0000789019", 2023, "2023-08-01", {
+            "products": ["Microsoft Azure cloud platform", "Office 365 Commercial & Consumer", "Windows 11 OEM and enterprise", "LinkedIn talent and marketing solutions", "Dynamics 365 ERP & CRM", "Xbox hardware & Game Pass", "Surface laptops and 2-in-1s", "GitHub developer platform & Copilot"],
+            "services": ["Azure OpenAI enterprise service", "Microsoft Copilot generative AI assistant", "Enterprise Mobility + Security", "Power Platform low-code development", "Xbox Cloud Gaming", "Bing AI Search advertising"],
+            "risks": ["Intense cloud competition with Amazon Web Services and Google Cloud", "Massive AI datacenter capital expenditure commitments and GPU scarcity", "Regulatory antitrust reviews concerning Activision Blizzard and cloud bundling", "Advanced persistent cyberattacks targeting identity and cloud services", "Macroeconomic enterprise IT budget rationalization and optimization", "Semiconductor hardware supply chain dependencies for datacenters", "Global data sovereignty and privacy mandates (GDPR, EU-US Data Privacy Framework)"],
+            "mda": ["Total revenue increased 7% (11% constant currency) to $211,915 million in FY2023 compared to $198,270 million in FY2022", "Productivity and Business Processes revenue grew 8% to $69,274 million driven by 13% Office 365 Commercial growth", "Intelligent Cloud revenue grew 17% to $87,907 million with Azure cloud services growing 27% (34% constant currency)", "More Personal Computing revenue fell 9% to $54,734 million driven by a 25% decline in Windows OEM revenue", "Gross margin expanded to $146,052 million (68.9% gross margin percentage)", "Research and Development expenses rose 11% to $27,195 million (12.8% of revenue) for cloud and AI engineering", "Operating income rose 6% to $88,523 million with an operating margin of 41.8%", "Operating cash flow generated was $87,582 million and capital expenditures were $28,107 million"],
+            "financials": ["Consolidated revenue: $211,915 million; Cost of revenue: $65,863 million; Gross margin: $146,052 million", "Operating income: $88,523 million; Net income: $72,361 million; Diluted earnings per share: $9.68", "Cash, cash equivalents and short-term investments: $111,262 million; Total assets: $411,976 million", "Long-term debt: $41,990 million; Stockholders equity: $206,223 million", "Free cash flow: $59,475 million; Dividends paid: $19,800 million; Share repurchases: $22,245 million"]
+        }),
+        ("NVDA", "NVIDIA Corp", "0001045810", 2024, "2024-02-21", {
+            "products": ["Hopper architecture GPUs (H100, H200)", "Grace CPU and Grace Hopper Superchip", "Quantum-2 InfiniBand and Spectrum-X Ethernet", "GeForce RTX 40 Series gaming GPUs", "NVIDIA DRIVE autonomous vehicle platform", "NVIDIA RTX workstation graphics"],
+            "services": ["NVIDIA AI Enterprise software suite", "DGX Cloud AI supercomputing service", "GeForce NOW cloud gaming", "Omniverse industrial digital twin platform", "NeMo and BioNeMo generative AI frameworks"],
+            "risks": ["Single-source dependency on TSMC for advanced silicon wafer fabrication and CoWoS packaging", "US export regulations restricting advanced AI GPUs (A100, H100, A800, H800) to China and other destinations", "Extreme customer concentration among tier-1 cloud hyperscalers (Microsoft, AWS, Google, Meta)", "Emerging custom ASIC accelerators developed by hyperscalers (Google TPU, AWS Trainium, Meta MTIA)", "Supply chain lead times for high-bandwidth memory (HBM3/HBM3e from SK Hynix, Micron, Samsung)"],
+            "mda": ["Total revenue grew 126% to a record $60,922 million in FY2024 compared to $26,974 million in FY2023", "Data Center revenue surged 217% to $47,525 million, representing 78.0% of total company revenue", "Gaming revenue increased 15% to $10,447 million driven by RTX 40 series upgrade demand", "Professional Visualization revenue was $1,553 million (+1%) and Automotive was $1,091 million (+21%)", "Gross margin expanded substantially to 72.7% from 56.9% in FY2023 due to Data Center mix and software value", "R&D expense increased 18% to $8,675 million; Operating income jumped 681% to $32,972 million", "Operating cash flow surged to $28,090 million compared to $5,641 million in FY2023"],
+            "financials": ["Total revenue: $60,922 million; Cost of revenue: $16,621 million; Gross profit: $44,301 million (72.7%)", "Operating expenses: R&D $8,675 million; SG&A $2,654 million; Operating income: $32,972 million", "Net income: $29,760 million (up 581% from $4,368 million); Diluted EPS: $11.93", "Cash, cash equivalents and marketable securities: $25,984 million; Total debt: $11,056 million", "Free cash flow: $26,947 million; Share repurchases and dividends returned: $9,915 million"]
+        }),
+        ("AMZN", "Amazon.com Inc", "0001018724", 2023, "2024-02-02", {
+            "products": ["Amazon online store & marketplace", "AWS Cloud Compute (EC2, S3, RDS)", "Amazon Prime membership service", "Echo smart speakers & Alexa", "Kindle e-readers & Fire tablets", "Ring home security systems", "Amazon Fresh & Whole Foods physical stores"],
+            "services": ["Amazon Web Services (AWS) enterprise cloud", "Third-party seller fulfillment (FBA)", "Amazon Advertising marketing services", "Prime Video streaming entertainment", "Amazon Bedrock foundation model service"],
+            "risks": ["Intense retail and e-commerce competition from global marketplaces and direct-to-consumer brands", "Cloud optimization trends by enterprises impacting AWS revenue growth rates", "Massive fixed-cost fulfillment and datacenter infrastructure capacity management", "Regulatory investigations into third-party marketplace algorithms and seller data use", "International foreign currency headwinds and logistics cost inflation"],
+            "mda": ["Total net sales increased 12% to $574,785 million in FY2023 from $513,983 million in FY2022", "North America segment net sales grew 12% to $352,828 million with operating income of $14,877 million", "International segment sales grew 11% to $131,200 million with operating loss improving to $2,656 million", "AWS segment net sales rose 13% to $90,757 million, delivering $24,631 million in operating income (66.8% of total profit)", "Operating income recovered dramatically to $36,852 million in FY2023 from $12,248 million in FY2022", "Technology and content expense was $85,622 million and Fulfillment expense was $84,664 million", "Operating cash flow increased 82% to $84,946 million and Free cash flow reached $36,810 million"],
+            "financials": ["Total net sales: $574,785 million; Cost of sales: $304,527 million; Operating income: $36,852 million", "Net income: $30,425 million (compared to net loss of $2,722 million in FY2022); Diluted EPS: $2.90", "Cash, cash equivalents and restricted cash: $73,890 million; Marketable securities: $13,008 million", "Total assets: $527,854 million; Long-term debt: $58,314 million; Stockholders equity: $201,875 million"]
+        }),
+        ("GOOGL", "Alphabet Inc.", "0001652044", 2023, "2024-01-31", {
+            "products": ["Google Search engine", "YouTube video platform", "Android mobile OS", "Google Chrome browser", "Google Maps and Navigation", "Google Play digital store", "Pixel smartphones and tablets", "Waymo autonomous ride-hailing"],
+            "services": ["Google Ads and AdSense network", "Google Cloud Platform (GCP)", "Google Workspace productivity tools", "YouTube Premium & TV subscriptions", "Gemini generative AI foundation models"],
+            "risks": ["High dependence on search advertising revenues vulnerable to economic downturns", "Antitrust lawsuits filed by US DOJ and European Commission regarding search distribution and ad tech", "Generative AI competition altering search queries and monetization models", "Datacenter capital expenditures for custom TPU accelerators and power availability", "Content moderation liabilities and global data privacy compliance"],
+            "mda": ["Alphabet consolidated revenues increased 9% to $307,394 million in FY2023 compared to $282,836 million in FY2022", "Google Search & other advertising revenues were $175,033 million, up 8% year-over-year", "YouTube advertising revenues reached $31,510 million (+8%) and Google Network was $31,311 million (-5%)", "Google Subscriptions platforms and devices revenues jumped 19% to $34,688 million", "Google Cloud revenue rose 26% to $33,088 million and generated full-year operating profit of $1,719 million (vs loss of $2,975M in FY2022)", "R&D expenses were $45,427 million (14.8% of revenue); Operating income was $84,293 million (margin 27.4%)", "Operating cash flow was $101,746 million and Free cash flow was $69,494 million"],
+            "financials": ["Revenues: $307,394 million; Operating income: $84,293 million; Net income: $73,795 million; Diluted EPS: $5.80", "Cash, cash equivalents and marketable securities: $110,916 million; Total assets: $402,392 million", "Long-term debt: $13,253 million; Total liabilities: $119,008 million; Stockholders equity: $283,384 million"]
+        }),
+        ("META", "Meta Platforms, Inc.", "0001326801", 2023, "2024-02-02", {
+            "products": ["Facebook social network", "Instagram photo & video platform", "WhatsApp messaging", "Messenger application", "Threads conversational app", "Meta Quest 3 mixed reality headset", "Ray-Ban Meta smart glasses"],
+            "services": ["Meta Ads digital marketing platform", "Meta Advantage automated ad targeting", "Llama open-source AI models", "Meta Horizon metaverse social platform"],
+            "risks": ["Ad targeting and measurement headwinds from mobile OS privacy restrictions (Apple ATT)", "Multi-billion dollar ongoing operating losses in Reality Labs segment", "Intense competition for user engagement from short-form video platforms (TikTok, YouTube Shorts)", "Antitrust, child safety, and algorithmic regulation investigations globally", "Heavy capital expenditures for AI compute infrastructure and custom MTIA silicon"],
+            "mda": ["Total revenue rose 16% to $134,902 million in FY2023 ('Year of Efficiency') compared to $116,609 million in FY2022", "Family of Apps revenue was $133,006 million with advertising revenue accounting for $131,948 million", "Reality Labs revenue was $1,896 million with an operating loss of $16,120 million (vs $13,717 million in FY2022)", "Total costs and expenses decreased 1% to $88,151 million due to headcount reductions and facility consolidations", "Operating income surged 62% to $46,751 million (operating margin 34.7%)", "R&D expenses were $38,482 million (28.5% of revenue); Free cash flow rose to $43,010 million"],
+            "financials": ["Revenue: $134,902 million; Operating income: $46,751 million; Net income: $39,098 million (up 69%); Diluted EPS: $14.87", "Cash, cash equivalents and marketable securities: $65,403 million; Total assets: $229,623 million", "Long-term debt: $18,385 million; Total liabilities: $76,442 million; Stockholders equity: $153,181 million"]
+        }),
+        ("TSLA", "Tesla, Inc.", "0001318605", 2023, "2024-01-29", {
+            "products": ["Model Y crossover SUV", "Model 3 sedan", "Model S luxury sedan", "Model X luxury SUV", "Cybertruck stainless steel pickup", "Tesla Semi commercial truck", "Megapack utility energy storage", "Powerwall home battery"],
+            "services": ["Full Self-Driving (FSD) Supervised software", "Tesla Supercharger global DC fast charging network", "Tesla Insurance underwriting", "Vehicle maintenance and service centers"],
+            "risks": ["Automotive gross margin compression from global vehicle price cuts and higher consumer financing rates", "Manufacturing ramp-up challenges for Cybertruck 4680 battery cells and cathode dry-coating", "Intensifying competition from Chinese EV manufacturers (such as BYD) in Europe and Asia", "Regulatory reviews and safety investigations regarding Autopilot and FSD compliance", "Raw material price volatility for lithium, nickel, cobalt, and rare earth minerals"],
+            "mda": ["Total revenues grew 19% to $96,773 million in FY2023 compared to $81,462 million in FY2022", "Automotive revenues were $82,419 million (+15%) based on 1,808,581 vehicle deliveries (1,739,707 Model 3/Y)", "Regulatory credits revenue was $1,790 million in FY2023 compared to $1,776 million in FY2022", "Energy generation and storage revenue surged 54% to $6,035 million (14.7 GWh Megapack deployments)", "Automotive gross margin (ex-regulatory credits) dropped to 17.1% from 26.2% due to vehicle price reductions", "R&D expenses increased to $3,969 million; Operating income was $8,891 million (margin 9.2%)", "Operating cash flow was $13,256 million; Capital expenditures were $8,899 million; Free cash flow was $4,357 million"],
+            "financials": ["Total revenues: $96,773 million; Cost of revenues: $79,113 million; Operating income: $8,891 million", "Net income: $14,997 million (benefited by $5.0 billion non-cash tax valuation allowance release); Diluted EPS: $4.30", "Cash, cash equivalents and investments: $29,094 million; Total debt: $2,857 million; Total assets: $106,618 million"]
+        }),
+        ("AMD", "Advanced Micro Devices, Inc.", "0000002488", 2023, "2024-01-31", {
+            "products": ["EPYC server CPUs (Genoa, Bergamo)", "Instinct MI300A & MI300X AI accelerators", "Ryzen desktop & notebook CPUs (Zen 4)", "Radeon RX 7000 gaming GPUs (RDNA 3)", "Xilinx Versal adaptive SoCs & FPGAs", "Pensando DPU data processing units"],
+            "services": ["ROCm open software platform for AI", "Custom semi-custom SoC design for gaming consoles (PS5, Xbox Series X/S)", "Embedded development suites"],
+            "risks": ["Fierce market competition from NVIDIA in AI computing and Intel in x86 microprocessors", "Sole-source foundry dependency on TSMC for advanced 5nm, 4nm, and 3nm process nodes and packaging", "US government restrictions on export of high-performance computing hardware to China", "PC client channel inventory digestion and gaming console cycle maturation", "Goodwill and intangible asset impairment risks from the Xilinx acquisition"],
+            "mda": ["Net revenue decreased 4% to $22,680 million in FY2023 compared to $23,601 million in FY2022", "Data Center segment revenue grew 7% to $6,496 million driven by EPYC CPU adoption and early MI300 shipments", "Client segment revenue fell 25% to $4,651 million due to PC market downturn and channel inventory clearance", "Gaming segment revenue fell 9% to $6,213 million due to lower semi-custom console SoC volumes", "Embedded segment revenue rose 17% to $5,320 million driven by a full year of Xilinx integration", "Gross margin was 46.0% ($10,438 million); R&D expenses rose 17% to $5,872 million; Operating income was $401 million"],
+            "financials": ["Net revenue: $22,680 million; Gross margin: $10,438 million; Operating income: $401 million; Net income: $854 million; Diluted EPS: $0.53", "Cash, cash equivalents and short-term investments: $5,775 million; Long-term debt: $2,467 million; Total assets: $67,888 million"]
+        }),
+        ("INTC", "Intel Corporation", "0000050863", 2023, "2024-01-26", {
+            "products": ["Intel Core Ultra client processors (Meteor Lake)", "Xeon Scalable server CPUs (Emerald Rapids)", "Gaudi 2 & Gaudi 3 AI accelerators", "Intel Arc discrete GPUs", "Mobileye autonomous driving EyeQ chips", "Intel Foundry Services contract silicon"],
+            "services": ["Intel Foundry Services (IFS) manufacturing & advanced packaging", "OpenVINO AI inference toolkit", "Developer cloud computing environments"],
+            "risks": ["Execution risks in the '5 Nodes in 4 Years' manufacturing roadmap (Intel 7, 4, 3, 20A, 18A)", "Market share loss to AMD in server CPUs and ARM architectures in client computing", "Enormous capital expenditure requirements for global foundry fabs (Arizona, Ohio, Germany, Ireland)", "Dependency on US CHIPS Act and European governmental subsidies", "Semiconductor cyclicality and China export restrictions"],
+            "mda": ["Total revenue fell 14% to $54,228 million in FY2023 compared to $63,054 million in FY2022", "Client Computing Group (CCG) revenue fell 8% to $29,259 million amidst PC market weakness", "Data Center and AI (DCAI) revenue fell 20% to $15,521 million due to competitive pressure", "Network and Edge (NEX) revenue fell 31% to $5,790 million; Mobileye revenue rose 11% to $2,077 million; IFS grew 103% to $952 million", "Gross margin was 40.0% ($21,703 million); R&D expenses were $16,045 million; Operating income was $93 million", "Operating cash flow was $11,471 million; Capital expenditures were $25,750 million; Adjusted free cash flow was $(11,887) million"],
+            "financials": ["Net revenue: $54,228 million; Gross margin: $21,703 million; Operating income: $93 million; Net income: $1,689 million; Diluted EPS: $0.40", "Cash and short-term investments: $25,031 million; Total debt: $49,307 million; Total assets: $191,572 million"]
+        }),
+        ("NFLX", "Netflix, Inc.", "0001065280", 2023, "2024-01-26", {
+            "products": ["Netflix streaming application", "Original scripted TV series", "Feature films and documentaries", "Mobile gaming portfolio", "Ad-supported subscription tier", "Paid sharing account add-on"],
+            "services": ["Global video-on-demand streaming service", "Content localization and dubbing in 30+ languages", "Open Connect content delivery network"],
+            "risks": ["Intense streaming competition from Disney+, Max, Amazon Prime Video, Apple TV+, and YouTube", "Content production costs and talent compensation inflation", "Subscriber churn and pricing elasticity across diverse international markets", "Foreign exchange rate volatility impacting international revenue per membership", "Dependence on Amazon Web Services (AWS) cloud hosting infrastructure"],
+            "mda": ["Total revenues grew 6.7% to $33,723 million in FY2023 compared to $31,616 million in FY2022", "Global paid memberships grew 12.8% year-over-year to 260.28 million at year-end, adding 29.53 million net subscribers", "UCAN revenue was $14,884 million; EMEA was $10,560 million; LATAM was $4,444 million; APAC was $3,835 million", "Operating income rose 21% to $6,954 million, delivering an operating margin of 20.6% compared to 17.8% in FY2022", "Content amortization expense was $14,196 million; Cash spent on content was $13,018 million", "Marketing expense was $2,654 million; Technology and development expense was $2,709 million", "Operating cash flow was $7,274 million; Free cash flow was $6,926 million compared to $1,618 million in FY2022"],
+            "financials": ["Revenues: $33,723 million; Cost of revenues: $19,703 million; Operating income: $6,954 million; Net income: $5,408 million; Diluted EPS: $12.03", "Cash and cash equivalents: $7,117 million; Long-term debt: $14,543 million; Total liabilities: $28,140 million; Total equity: $20,588 million"]
+        }),
     ]
+
+    filings_data: List[Dict[str, Any]] = []
+
+    for ticker, comp_name, cik, year, f_date, details in companies_meta:
+        item_1_paras = [f"Item 1. Business for {comp_name} ({ticker}) in fiscal year {year}."]
+        for p in details["products"]:
+            item_1_paras.append(f"{comp_name} product disclosure: {p}.")
+        for s in details["services"]:
+            item_1_paras.append(f"{comp_name} services and platform disclosure: {s}.")
+        item_1_paras.append(f"{comp_name} operations and distribution: Sells worldwide through direct and indirect channels.")
+        item_1_paras.append(f"{comp_name} human capital: Maintains thousands of engineers, researchers, and operational specialists.")
+
+        item_1a_paras = [f"Item 1A. Risk Factors for {comp_name} ({ticker}) as disclosed in the FY{year} 10-K filing."]
+        for idx, r in enumerate(details["risks"], 1):
+            item_1a_paras.append(f"Risk Factor {idx}: {r}.")
+        item_1a_paras.append(f"{comp_name} regulatory risks: Evolving international laws may impact operational compliance.")
+
+        item_7_paras = [f"Item 7. Management's Discussion and Analysis of Financial Condition for {comp_name} ({ticker}) FY{year}."]
+        for m in details["mda"]:
+            item_7_paras.append(f"MD&A Disclosure: {m}.")
+        item_7_paras.append(f"{comp_name} capital resources: Management believes existing liquidity is sufficient for ongoing requirements.")
+
+        item_8_paras = [f"Item 8. Financial Statements and Supplementary Data for {comp_name} ({ticker}) FY{year}."]
+        for f in details["financials"]:
+            item_8_paras.append(f"Financial Note: {f}.")
+        item_8_paras.append(f"{comp_name} basis of presentation: Financial statements prepared in conformity with US GAAP.")
+
+        filings_data.append({
+            "ticker": ticker,
+            "company_name": comp_name,
+            "cik": cik,
+            "fiscal_year": year,
+            "filing_date": f_date,
+            "sections": {
+                "ITEM_1": "\n\n".join(item_1_paras),
+                "ITEM_1A": "\n\n".join(item_1a_paras),
+                "ITEM_7": "\n\n".join(item_7_paras),
+                "ITEM_8": "\n\n".join(item_8_paras),
+            }
+        })
+
+    return filings_data

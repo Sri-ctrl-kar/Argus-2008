@@ -176,8 +176,16 @@ class DenseVectorIndex:
     def count(self) -> int:
         return len(self.chunks)
 
+    def get(self) -> Dict[str, Any]:
+        return {
+            "ids": [c.chunk_id for c in self.chunks],
+            "documents": [c.text for c in self.chunks],
+            "metadatas": [c.to_dict() for c in self.chunks],
+        }
+
     @classmethod
     def load(cls, filepath: Path) -> "DenseVectorIndex":
+
         with open(filepath, "rb") as f:
             data = pickle.load(f)
         chunks = [DocumentChunk(**c) for c in data["chunks"]]

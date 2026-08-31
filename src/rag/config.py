@@ -72,10 +72,11 @@ ITEM_SECTIONS = {
 # ==========================================
 # Chunking Hyperparameters
 # ==========================================
-FIXED_CHUNK_SIZE = 120  # tokens / approx words
-FIXED_CHUNK_OVERLAP = 25
-SECTION_CHUNK_MAX_TOKENS = 120
-SECTION_CHUNK_MIN_TOKENS = 30
+FIXED_CHUNK_SIZE = 50  # tokens / approx words
+FIXED_CHUNK_OVERLAP = 10
+SECTION_CHUNK_MAX_TOKENS = 50
+SECTION_CHUNK_MIN_TOKENS = 10
+
 
 
 # ==========================================
