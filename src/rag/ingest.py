@@ -97,13 +97,14 @@ class EDGARClient:
         forms = recent.get("form", [])
         accessions = recent.get("accessionNumber", [])
         primary_docs = recent.get("primaryDocument", [])
+        report_dates = recent.get("reportDate", [])
         filing_dates = recent.get("filingDate", [])
 
         target_idx = None
-        for idx, form in enumerate(forms):
+        detected_fiscal_year = fiscal_year
+        for idx, (form, r_date) in enumerate(zip(forms, report_dates)):
             if form == "10-K":
-                # Look for filing date matching desired year or subsequent early Q1
-                f_date = filing_dates[idx]
+                detected_fiscal_year = int(r_date[:4]) if r_date else fiscal_year
                 target_idx = idx
                 break
 
@@ -111,10 +112,12 @@ class EDGARClient:
             logger.warning("No 10-K found for %s in recent filings.", ticker)
             return None
 
+        cache_path = FILINGS_RAW_DIR / f"{ticker}_10K_{detected_fiscal_year}.html"
         acc_num = accessions[target_idx].replace("-", "")
         doc_name = primary_docs[target_idx]
         cik_num = str(int(cik))
         doc_url = f"https://www.sec.gov/Archives/edgar/data/{cik_num}/{acc_num}/{doc_name}"
+
 
         self._rate_limit()
         try:
@@ -229,10 +232,12 @@ def build_curated_10k_corpus() -> List[ParsedFiling]:
     parsed_list: List[ParsedFiling] = []
 
     for ticker, comp_info in TARGET_COMPANIES.items():
-        fiscal_year = 2024 if ticker == "NVDA" else 2023
-        filing_path = FILINGS_RAW_DIR / f"{ticker}_10K_{fiscal_year}.html"
+        matches = list(FILINGS_RAW_DIR.glob(f"{ticker}_10K_*.html"))
+        if matches:
+            filing_path = matches[0]
+            m_year = re.search(r"_(\d{4})\.html$", filing_path.name)
+            fiscal_year = int(m_year.group(1)) if m_year else 2023
 
-        if filing_path.exists():
             html_text = filing_path.read_text(encoding="utf-8")
             clean_text = BeautifulSoup(html_text, "lxml").get_text(" ", strip=True)
 
