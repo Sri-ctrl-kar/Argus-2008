@@ -44,9 +44,18 @@ class DocumentChunk:
     text: str
     strategy: str
     token_count: int
+    section: Optional[str] = None
+
+    def __post_init__(self):
+        if self.section is None:
+            self.section = self.section_name
 
     def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
+        d = asdict(self)
+        d["section"] = self.section or self.section_name
+        return d
+
+
 
 
 def count_tokens(text: str) -> int:
