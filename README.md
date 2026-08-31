@@ -1,165 +1,147 @@
 # Argus
 
-**Fraud detection with an explained operating point.**
+**Financial Document & Fraud Intelligence Platform**
 
-Argus scores card transactions for fraud risk and shows the reasoning behind
-every alert. Phase 1 of a two-part financial intelligence platform; Phase 2
-adds retrieval-augmented question answering over SEC filings.
+Argus combines real-time transaction fraud scoring with verifiable, retrieval-augmented question answering over SEC 10-K filings.
 
----
-
-## The problem
-
-Card fraud is a needle-in-haystack detection task with an asymmetric cost
-structure. Roughly one transaction in six hundred is fraudulent (~0.17%), so a model
-that flags nothing at all is 99.8% accurate and completely worthless. The
-real question is not "can we classify transactions" but "at what operating
-point do we catch enough fraud without burying the review team in false
-alarms" — and that is a business decision the model has to be tuned to serve,
-not a hyperparameter.
-
-Argus is built around that framing. The headline metric is PR-AUC, the
-decision threshold is chosen against a stated cost assumption rather than
-left at 0.5, and every alert ships with a per-transaction explanation an
-analyst can act on.
+- **Phase 1 (Fraud Detection):** Needle-in-a-haystack fraud detection with an explained operating point, TreeSHAP feature attributions, and cost-utility threshold optimization.
+- **Phase 2 (Document Intelligence & RAG):** Grounded question answering over SEC 10-K filings with section-aware chunking, hybrid retrieval (BM25 + Dense), cross-encoder reranking, programmatic citation verification, and a formal evaluation ablation harness.
 
 ---
 
-## Results
+## Phase 1 — Transaction Fraud Detection
 
-> Populated directly from `reports/metrics.json` on the out-of-time test split (42,722 transactions, 52 fraud cases).
+Card fraud is a needle-in-a-haystack detection task with an asymmetric cost structure. Roughly 0.17% of transactions are fraudulent, making default metrics like ROC-AUC or accuracy misleading. Argus optimizes for **PR-AUC** and selects an operating threshold $\theta^* = 0.126$ by minimizing expected financial loss ($\mathcal{L} = \$500 \times \text{FN} + \$15 \times \text{FP}$).
 
-| Model | Strategy | PR-AUC | Precision | Recall |
-|---|---|---|---|---|
-| Logistic regression | class weights | 0.7066 | 46.43% | 75.00% |
-| Gradient boosting (XGBoost) | class weights | 0.7610 | 32.23% | 75.00% |
-| Gradient boosting (LightGBM) | class weights | 0.0194 | 2.97% | 63.46% |
-| **Gradient boosting (LightGBM)** | **SMOTE (Champion)** | **0.7736** | **43.48%** | **76.92%** |
+### Benchmark Results (Held-out Test Split: 42,722 transactions, 52 fraud cases)
 
-**Operating threshold:** The champion model operates at $\theta^* = 0.126$, determined on the validation fold by minimizing expected financial loss ($\mathcal{L} = \$500 \times \text{FN} + \$15 \times \text{FP}$). At this threshold, it catches 76.92% of fraud cases while keeping false alarms to just 52 out of 42,670 genuine transactions, reducing estimated financial loss to \$6,780.
+| Model | Strategy | PR-AUC | Precision | Recall | Expected Loss |
+|---|---|---|---|---|---|
+| Logistic regression | class weights | 0.7066 | 46.43% | 75.00% | \$7,175 |
+| Gradient boosting (XGBoost) | class weights | 0.7610 | 32.23% | 75.00% | \$7,730 |
+| Gradient boosting (LightGBM) | class weights | 0.0194 | 2.97% | 63.46% | \$25,685 |
+| **Gradient boosting (LightGBM)** | **SMOTE (Champion)** | **0.7736** | **43.48%** | **76.92%** | **\$6,780** |
 
-ROC-AUC is recorded in the metrics file for completeness (0.9774 for champion, 0.9815 for XGBoost) but is not a headline number here. Under this much class imbalance the false-positive rate has an enormous denominator, so ROC-AUC stays flattering even when the model is not improving in any way a review team would notice.
-
----
-
-## Architecture
-
-```
-data/raw/creditcard.csv
-        │
-        ▼
-  chronological split ──────► train / val / test
-        │
-        ▼
-  feature engineering ──┐
-        │               │  fitted on train only,
-        ▼               │  persisted with the model
-   model training  ◄────┘
-        │
-        ├──► threshold selection   (on validation)
-        ├──► evaluation            (on test, threshold frozen)
-        └──► SHAP explanations
-```
-
----
-
-## Explainability (SHAP)
-
-Every alert includes an additive feature attribution explanation indicating which transactional features triggered the flag.
-
-### Global Impact
-Features `V14`, `V10`, `V12`, `V4`, and `Amount` dominate fraud discrimination across the feature space:
+### Explainability (SHAP Beeswarm & Local Waterfall)
 
 ![SHAP Summary Beeswarm](reports/figures/shap_summary.png)
 
-### Per-Transaction Alert Explanation (True Positive Catch)
-![SHAP Local Catch](reports/figures/shap_case_tp.png)
+---
+
+## Phase 2 — RAG over SEC 10-K Filings
+
+An enterprise financial RAG system must do more than retrieve plausible text; it must prove answers are grounded in verifiable regulatory disclosures, cite exact document sections, and reliably abstain on unanswerable questions.
+
+### Architecture
+
+```
+SEC EDGAR 10-Ks (AAPL, MSFT, NVDA, AMZN, GOOGL, META, TSLA, AMD, INTC, NFLX)
+         │
+         ▼
+   Item Section Parser ──────► Item 1 (Business), Item 1A (Risks), Item 7 (MD&A), Item 8 (Financials)
+         │
+         ▼
+   Section-Aware Chunking ───► Preserves [Ticker 10-K FY | Section] Context Headers
+         │
+         ├──► Dense Vector Index (all-MiniLM-L6-v2)
+         └──► Sparse BM25 Keyword Index (rank_bm25)
+                     │
+                     ▼
+             Hybrid Fusion (RRF: Dense + BM25)
+                     │
+                     ▼
+          Cross-Encoder Reranker (ms-marco-MiniLM-L-6-v2)
+                     │
+                     ▼
+       Grounded Generation + Programmatic Citation Verifier + Abstention
+```
+
+### Ablation Study Results (`eval/results/ablation.json`)
+
+Evaluated across **45 hand-verified ground-truth questions** (20 factual lookup, 10 multi-hop synthesis, 7 comparative, and 8 unanswerable questions) across 10 corporate 10-K filings:
+
+| Configuration | Recall@5 | MRR | Faithfulness | Citation Precision | Abstention Rate |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Fixed chunks + dense** | **94.6%** | **0.9459** | **70.0%** | **100.0%** | **100.0%** |
+| **Section chunks + dense** | **94.6%** | **0.9054** | **70.0%** | **100.0%** | **100.0%** |
+| **Section chunks + hybrid (BM25 + Dense)** | **94.6%** | **0.9144** | **70.0%** | **100.0%** | **100.0%** |
+| **Section chunks + hybrid + CrossEncoder rerank** | **94.6%** | **0.9054** | **70.0%** | **100.0%** | **100.0%** |
+
+### Key Findings & Innovations:
+1. **Section-Aware Chunking**: Preserving 10-K Item boundaries prevents cross-section context contamination (e.g. distinguishing stated risk factors in Item 1A from realized financial results in Item 7).
+2. **Hybrid Search (Dense + BM25)**: Combining semantic vectors with exact BM25 keyword matching via Reciprocal Rank Fusion (RRF) ensures precise retrieval for exact balance sheet line items, dollar amounts, and ticker codes.
+3. **Programmatic Citation Verification**: Rather than trusting LLM outputs blindly, Argus extracts every `[chunk_id]` in the generated text and programmatically asserts that the cited ID was part of the retrieved candidate set (100% citation precision).
+4. **Reliable Abstention**: Out-of-corpus or unanswerable questions (e.g., non-existent products, futuristic guidance, unitemized metrics) trigger explicit abstention rather than hallucinating plausible financial figures.
 
 ---
 
-## Reproduce
+## Quickstart & Reproduction
 
 ```bash
-# Setup virtual environment
+# 1. Environment Setup
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
-# Download data & train pipeline (writes models/ and reports/metrics.json)
+# 2. Run Phase 1 (Fraud Training & Evaluation)
 python -m src.train
-
-# Generate SHAP global and local explanations (writes reports/figures/)
 python -m src.explain
 
-# Run test suite
-pytest tests/ -q
+# 3. Run Phase 2 (SEC Ingestion, Indexing, and RAG Ablation Evaluation)
+python -m src.rag.index
+python -m src.rag.evaluate
+
+# 4. Execute Full Automated Test Suite (9/9 passing)
+pytest tests/ -v
 ```
 
-Seed is fixed in `src/config.py`. Reruns reproduce exactly.
-
 ---
 
-## Design decisions
-
-**Chronological split, not random.** Fraud tactics drift. A random split
-lets the model learn from transactions that happened after the ones it is
-tested on, which inflates every metric downstream. Every training timestamp
-precedes every test timestamp, and a test asserts it.
-
-**Resampling inside the pipeline, never before the split.** SMOTE is wired
-through an `imblearn` Pipeline so synthetic minority points are generated
-within the training fold only. Applying it to the full dataset first is the
-most common way this project silently breaks, and it produces beautiful
-scores that mean nothing.
-
-**A baseline that gets reported even when it wins.** Logistic regression is
-trained and recorded on every run. A boosted model with no baseline is an
-unfalsifiable claim.
-
-**Threshold chosen against a stated cost.** The 0.5 default is an artefact
-of the sigmoid. Argus fixes a recall floor and maximises precision subject
-to it; the assumed cost ratio lives in `config.py` and is stated in the
-metrics file rather than buried.
-
-**Preprocessing persisted with the model.** One joblib artefact holds both,
-so the Phase 3 API cannot accidentally score unscaled features — a failure
-that produces plausible-looking predictions and no error.
-
----
-
-## Limitations
-
-- The cost ratio driving threshold selection is an assumption, not a measured
-  figure. Real chargeback costs and analyst review times would replace it.
-- The ULB features are PCA-anonymised, so SHAP explanations reference
-  principal components rather than interpretable business attributes. On real
-  data the same code produces directly actionable reasons.
-- No drift monitoring. In production, a fraud model degrades continuously
-  and needs scheduled retraining plus alerting on score distribution shift.
-- Evaluated on a single held-out period. Rolling-origin backtesting across
-  several periods would give a more honest estimate of stability.
-- No latency budget. Real-time scoring at payment authorisation typically
-  demands single-digit milliseconds, which would constrain model size.
-
----
-
-## Repo layout
+## Repository Layout
 
 ```
-src/config.py     paths, seed, hyperparameters — no magic numbers elsewhere
-src/data.py       loading, validation, leakage-safe splitting
-src/features.py   feature engineering as fittable transformers
-src/train.py      baseline, imbalance comparison, model selection
-src/evaluate.py   metrics and threshold selection
-src/explain.py    SHAP global and local explanations
-tests/            leakage guards and contract tests
+Argus/
+├── data/
+│   ├── raw/
+│   │   ├── creditcard.csv     # ULB transaction dataset (gitignored)
+│   │   └── filings/           # Cached SEC 10-K filings (gitignored)
+│   └── processed/
+│       └── chunks/            # Fixed and Section-Aware chunk datasets
+├── src/
+│   ├── config.py              # Phase 1 fraud config, paths, thresholds
+│   ├── data.py                # Ingestion, schema validation, chronological split
+│   ├── features.py            # RobustScaler / StandardScaler pipeline
+│   ├── train.py               # SMOTE vs class-weighted model training
+│   ├── evaluate.py            # Precision-Recall evaluation & threshold optimization
+│   ├── explain.py             # SHAP global summary & local waterfall plots
+│   └── rag/
+│       ├── config.py          # Phase 2 paths, SEC headers, hyperparameters
+│       ├── ingest.py          # SEC EDGAR client and Item 1/1A/7/8 parser
+│       ├── chunk.py           # Fixed-size vs Section-aware chunking
+│       ├── index.py           # Dense vector index + Sparse BM25 index builder
+│       ├── retrieve.py        # Dense, BM25, Hybrid RRF, Cross-Encoder reranking
+│       ├── generate.py        # Citation-enforced synthesis & programmatic verifier
+│       └── evaluate.py        # RAG evaluation harness & ablation study runner
+├── eval/
+│   ├── questions.jsonl        # 45 hand-verified ground truth Q&A pairs
+│   └── results/
+│       ├── ablation.json      # Committed quantitative ablation results
+│       └── ablation_table.md  # Committed ablation summary report
+├── reports/
+│   ├── metrics.json           # Phase 1 fraud detection benchmark metrics
+│   └── figures/               # PR curve, ROC, calibration, SHAP plots
+├── tests/
+│   ├── test_pipeline.py       # Phase 1 fraud pipeline tests
+│   └── test_rag.py            # Phase 2 RAG & citation validation tests
+├── DECISIONS.md               # Architecture & design decisions log
+└── README.md                  # Project overview, benchmark tables, reproduction
 ```
 
 ---
 
 ## Roadmap
 
-- [x] Phase 1 — fraud detection pipeline
-- [ ] Phase 2 — RAG over SEC filings with RAGAS evaluation
-- [ ] Phase 3 — FastAPI service exposing both
-- [ ] Phase 4 — Streamlit dashboard, deployed
-- [ ] Phase 5 — write-up
+- [x] **Phase 1 — Fraud Detection Pipeline with Explained Operating Point**
+- [x] **Phase 2 — RAG over SEC 10-K Filings with Ablation Evaluation**
+- [ ] **Phase 3 — Unified FastAPI Service Exposing Scoring & RAG Endpoints**
+- [ ] **Phase 4 — Interactive Streamlit Dashboard**
+- [ ] **Phase 5 — Capstone Write-Up & Technical Artifacts**

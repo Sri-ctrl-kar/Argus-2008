@@ -1,0 +1,64 @@
+{
+  "ablation_experiments": [
+    {
+      "configuration": "Fixed chunks + dense",
+      "metrics": {
+        "recall@5": 0.9459459459459459,
+        "mrr": 0.9459459459459459,
+        "faithfulness": 0.7,
+        "citation_precision": 1.0,
+        "abstention_accuracy": 1.0
+      },
+      "sample_counts": {
+        "total_questions": 45,
+        "answerable_questions": 37,
+        "unanswerable_questions": 8
+      }
+    },
+    {
+      "configuration": "Section chunks + dense",
+      "metrics": {
+        "recall@5": 0.9459459459459459,
+        "mrr": 0.9054054054054054,
+        "faithfulness": 0.7,
+        "citation_precision": 1.0,
+        "abstention_accuracy": 1.0
+      },
+      "sample_counts": {
+        "total_questions": 45,
+        "answerable_questions": 37,
+        "unanswerable_questions": 8
+      }
+    },
+    {
+      "configuration": "Section chunks + hybrid",
+      "metrics": {
+        "recall@5": 0.9459459459459459,
+        "mrr": 0.9144144144144145,
+        "faithfulness": 0.7,
+        "citation_precision": 1.0,
+        "abstention_accuracy": 1.0
+      },
+      "sample_counts": {
+        "total_questions": 45,
+        "answerable_questions": 37,
+        "unanswerable_questions": 8
+      }
+    },
+    {
+      "configuration": "Section chunks + hybrid + rerank",
+      "metrics": {
+        "recall@5": 0.9459459459459459,
+        "mrr": 0.9054054054054054,
+        "faithfulness": 0.7,
+        "citation_precision": 1.0,
+        "abstention_accuracy": 1.0
+      },
+      "sample_counts": {
+        "total_questions": 45,
+        "answerable_questions": 37,
+        "unanswerable_questions": 8
+      }
+    }
+  ]
+}
