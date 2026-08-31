@@ -141,6 +141,20 @@ class CrossEncoderReranker:
         return scored[:top_k]
 
 
+def reciprocal_rank_fusion(rankings: List[List[str]], k: int = 60) -> List[str]:
+    """Fuse rankings by rank position, not score.
+
+    Raw BM25 and cosine scores are on incompatible scales -- summing them
+    lets BM25's unbounded values swamp cosine's [0,1] range. RRF sidesteps
+    the problem entirely by using only ordinal position.
+    """
+    scores: Dict[str, float] = {}
+    for ranking in rankings:
+        for rank, chunk_id in enumerate(ranking, start=1):
+            scores[chunk_id] = scores.get(chunk_id, 0.0) + 1.0 / (k + rank)
+    return sorted(scores, key=scores.get, reverse=True)
+
+
 class RAGRetriever:
     """Unified multi-mode retrieval engine for SEC 10-K filings."""
 
@@ -184,27 +198,21 @@ class RAGRetriever:
             initial_scores = [s for _, s in candidates]
         else:
             # 2. Hybrid Retrieval (Reciprocal Rank Fusion)
-            dense_res = self.dense_index.search(query, top_k=DENSE_TOP_K, filter_ticker=filter_ticker)
-            bm25_res = self.bm25_index.search(query, top_k=BM25_TOP_K, filter_ticker=filter_ticker)
+            # Retrieve deeper from each arm (k=50), then fuse and truncate
+            dense_res = self.dense_index.search(query, top_k=50, filter_ticker=filter_ticker)
+            bm25_res = self.bm25_index.search(query, top_k=50, filter_ticker=filter_ticker)
 
-            # RRF calculation (k_rrf = 60)
-            k_rrf = 60
-            rrf_scores: Dict[str, float] = {}
-            chunk_map: Dict[str, DocumentChunk] = {}
+            dense_ids = [c.chunk_id for c, _ in dense_res]
+            bm25_ids = [c.chunk_id for c, _ in bm25_res]
 
-            for rank, (chunk, _) in enumerate(dense_res):
-                cid = chunk.chunk_id
-                chunk_map[cid] = chunk
-                rrf_scores[cid] = rrf_scores.get(cid, 0.0) + (HYBRID_ALPHA / (k_rrf + rank + 1))
+            chunk_map: Dict[str, DocumentChunk] = {
+                c.chunk_id: c for c, _ in (dense_res + bm25_res)
+            }
 
-            for rank, (chunk, _) in enumerate(bm25_res):
-                cid = chunk.chunk_id
-                chunk_map[cid] = chunk
-                rrf_scores[cid] = rrf_scores.get(cid, 0.0) + ((1.0 - HYBRID_ALPHA) / (k_rrf + rank + 1))
+            fused_ids = reciprocal_rank_fusion([dense_ids, bm25_ids], k=60)
+            initial_chunks = [chunk_map[cid] for cid in fused_ids if cid in chunk_map]
+            initial_scores = [1.0 / (idx + 1) for idx in range(len(initial_chunks))]
 
-            sorted_rrf = sorted(rrf_scores.items(), key=lambda x: x[1], reverse=True)
-            initial_chunks = [chunk_map[cid] for cid, _ in sorted_rrf]
-            initial_scores = [score for _, score in sorted_rrf]
 
         # 3. Optional Reranking Step
         if self.use_reranker and self.reranker is not None and initial_chunks:
