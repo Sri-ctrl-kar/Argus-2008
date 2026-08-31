@@ -111,9 +111,8 @@ class SectionAwareChunker:
     """
     Candidate Strategy: Section-aware chunking.
     1. Splits strictly on 10-K Item boundaries (Item 1, 1A, 7, 8).
-    2. Sub-splits long sections recursively on natural paragraph breaks.
-    3. Prepends a structured metadata header to every sub-chunk so the LLM and retriever
-       always retain context of the company, fiscal year, and section.
+    2. Sub-splits sections into granular, bounded token windows.
+    3. Retains exact verbatim substrings from the source document.
     """
 
     def __init__(self, max_tokens: int = SECTION_CHUNK_MAX_TOKENS, min_tokens: int = SECTION_CHUNK_MIN_TOKENS):
@@ -126,57 +125,18 @@ class SectionAwareChunker:
 
         for sec_name, sec_text in filing.sections.items():
             sec_title = ITEM_SECTIONS.get(sec_name, sec_name)
-            # Prepend contextual header
-            header = f"[{filing.ticker} ({filing.company_name}) 10-K FY{filing.fiscal_year} | {sec_title}]\n"
+            words = sec_text.split()
+            if not words:
+                continue
 
-            # Split section by paragraphs or bullet items
-            raw_lines = [p.strip() for p in sec_text.split("\n") if p.strip()]
-            paragraphs = []
-            for line in raw_lines:
-                if len(line.split()) > self.max_tokens:
-                    # Sub-split long lines
-                    words = line.split()
-                    for j in range(0, len(words), self.max_tokens):
-                        paragraphs.append(" ".join(words[j : j + self.max_tokens]))
-                else:
-                    paragraphs.append(line)
+            window_size = self.max_tokens
+            step_size = max(10, self.max_tokens - 10)
 
-            current_buffer: List[str] = []
-            current_token_count = 0
-
-
-            for para in paragraphs:
-                para_tokens = count_tokens(para)
-                if current_token_count + para_tokens > self.max_tokens and current_buffer:
-                    # Flush current buffer
-                    chunk_body = "\n\n".join(current_buffer)
-                    full_chunk_text = header + chunk_body
-                    chunk_id = f"{filing.doc_id}_{sec_name}_{chunk_idx:04d}"
-                    chunks.append(
-                        DocumentChunk(
-                            chunk_id=chunk_id,
-                            doc_id=filing.doc_id,
-                            ticker=filing.ticker,
-                            company_name=filing.company_name,
-                            fiscal_year=filing.fiscal_year,
-                            section_name=sec_name,
-                            section_title=sec_title,
-                            text=full_chunk_text,
-                            strategy="section_aware",
-                            token_count=count_tokens(full_chunk_text),
-                        )
-                    )
-                    chunk_idx += 1
-                    current_buffer = [para]
-                    current_token_count = para_tokens
-                else:
-                    current_buffer.append(para)
-                    current_token_count += para_tokens
-
-            # Flush remaining paragraphs
-            if current_buffer:
-                chunk_body = "\n\n".join(current_buffer)
-                full_chunk_text = header + chunk_body
+            for i in range(0, len(words), step_size):
+                window_words = words[i : i + window_size]
+                if not window_words:
+                    continue
+                chunk_body = " ".join(window_words)
                 chunk_id = f"{filing.doc_id}_{sec_name}_{chunk_idx:04d}"
                 chunks.append(
                     DocumentChunk(
@@ -187,14 +147,15 @@ class SectionAwareChunker:
                         fiscal_year=filing.fiscal_year,
                         section_name=sec_name,
                         section_title=sec_title,
-                        text=full_chunk_text,
+                        text=chunk_body,
                         strategy="section_aware",
-                        token_count=count_tokens(full_chunk_text),
+                        token_count=len(window_words),
                     )
                 )
                 chunk_idx += 1
 
         return chunks
+
 
 
 def generate_all_chunks() -> Dict[str, List[DocumentChunk]]:
