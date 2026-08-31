@@ -226,6 +226,48 @@ class GroundedGenerator:
         )
 
 
+def answer(question: str, contexts: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """
+    Public entry point for ablation harness.
+    Returns: {'answer': str, 'cited_ids': list[str], 'abstained': bool}
+    """
+    from src.rag.chunk import DocumentChunk
+
+    mock_results: List[RetrievalResult] = []
+    for rank, c in enumerate(contexts, 1):
+        c_id = c.get("id", f"chunk_{rank}")
+        c_text = c.get("text", "")
+        chunk_obj = DocumentChunk(
+            chunk_id=c_id,
+            doc_id=c_id.split("_")[0] if "_" in c_id else "DOC",
+            ticker="TICKER",
+            company_name="COMPANY",
+            fiscal_year=2023,
+            section_name="SECTION",
+            section_title="TITLE",
+            text=c_text,
+            strategy="section_aware",
+            token_count=len(c_text.split()),
+        )
+        mock_results.append(
+            RetrievalResult(
+                chunk=chunk_obj,
+                score=1.0 / rank,
+                rank=rank,
+                retrieval_method="rag",
+            )
+        )
+
+    generator = GroundedGenerator()
+    res = generator.generate_answer(question, mock_results)
+    return {
+        "answer": res.response_text,
+        "cited_ids": res.verification.cited_ids,
+        "abstained": res.abstained,
+    }
+
+
+
 if __name__ == "__main__":
     from src.rag.retrieve import RAGRetriever
 

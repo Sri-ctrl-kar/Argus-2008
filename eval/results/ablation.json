@@ -1,64 +1,74 @@
-{
-  "ablation_experiments": [
-    {
-      "configuration": "Fixed chunks + dense",
-      "metrics": {
-        "recall@5": 0.9459459459459459,
-        "mrr": 0.9459459459459459,
-        "faithfulness": 0.7,
-        "citation_precision": 1.0,
-        "abstention_accuracy": 1.0
-      },
-      "sample_counts": {
-        "total_questions": 45,
-        "answerable_questions": 37,
-        "unanswerable_questions": 8
-      }
-    },
-    {
-      "configuration": "Section chunks + dense",
-      "metrics": {
-        "recall@5": 0.9459459459459459,
-        "mrr": 0.9054054054054054,
-        "faithfulness": 0.7,
-        "citation_precision": 1.0,
-        "abstention_accuracy": 1.0
-      },
-      "sample_counts": {
-        "total_questions": 45,
-        "answerable_questions": 37,
-        "unanswerable_questions": 8
-      }
-    },
-    {
-      "configuration": "Section chunks + hybrid",
-      "metrics": {
-        "recall@5": 0.9459459459459459,
-        "mrr": 0.9144144144144145,
-        "faithfulness": 0.7,
-        "citation_precision": 1.0,
-        "abstention_accuracy": 1.0
-      },
-      "sample_counts": {
-        "total_questions": 45,
-        "answerable_questions": 37,
-        "unanswerable_questions": 8
-      }
-    },
-    {
-      "configuration": "Section chunks + hybrid + rerank",
-      "metrics": {
-        "recall@5": 0.9459459459459459,
-        "mrr": 0.9054054054054054,
-        "faithfulness": 0.7,
-        "citation_precision": 1.0,
-        "abstention_accuracy": 1.0
-      },
-      "sample_counts": {
-        "total_questions": 45,
-        "answerable_questions": 37,
-        "unanswerable_questions": 8
-      }
-    }
-  ]
-}
+[
+  {
+    "config": "fixed_dense",
+    "label": "Fixed chunks + dense",
+    "n_answerable": 37,
+    "n_unanswerable": 8,
+    "recall@1": 0.10810810810810811,
+    "recall@3": 0.1891891891891892,
+    "recall@5": 0.2972972972972973,
+    "mrr": 0.16711711711711713,
+    "latency_ms_median": 14.80450000235578,
+    "latency_ms_p95": 226.32216599959065,
+    "citation_precision": 1.0,
+    "abstention_on_unanswerable": 1.0,
+    "over_abstention_on_answerable": 0.7027027027027027,
+    "faithfulness": null,
+    "answer_relevancy": null,
+    "context_precision": null
+  },
+  {
+    "config": "section_dense",
+    "label": "Section chunks + dense",
+    "n_answerable": 37,
+    "n_unanswerable": 8,
+    "recall@1": 0.13513513513513514,
+    "recall@3": 0.24324324324324326,
+    "recall@5": 0.2702702702702703,
+    "mrr": 0.17657657657657658,
+    "latency_ms_median": 10.238917002425296,
+    "latency_ms_p95": 17.61724999960279,
+    "citation_precision": 1.0,
+    "abstention_on_unanswerable": 1.0,
+    "over_abstention_on_answerable": 0.6756756756756757,
+    "faithfulness": null,
+    "answer_relevancy": null,
+    "context_precision": null
+  },
+  {
+    "config": "section_hybrid",
+    "label": "Section chunks + hybrid (BM25 + dense)",
+    "n_answerable": 37,
+    "n_unanswerable": 8,
+    "recall@1": 0.02702702702702703,
+    "recall@3": 0.13513513513513514,
+    "recall@5": 0.1891891891891892,
+    "mrr": 0.07972972972972973,
+    "latency_ms_median": 32.700499999918975,
+    "latency_ms_p95": 47.901083999022376,
+    "citation_precision": 1.0,
+    "abstention_on_unanswerable": 1.0,
+    "over_abstention_on_answerable": 0.6756756756756757,
+    "faithfulness": null,
+    "answer_relevancy": null,
+    "context_precision": null
+  },
+  {
+    "config": "section_hybrid_rerank",
+    "label": "Section chunks + hybrid + rerank",
+    "n_answerable": 37,
+    "n_unanswerable": 8,
+    "recall@1": 0.08108108108108109,
+    "recall@3": 0.1891891891891892,
+    "recall@5": 0.21621621621621623,
+    "mrr": 0.12837837837837837,
+    "latency_ms_median": 84.17474999805563,
+    "latency_ms_p95": 277.4286249987199,
+    "citation_precision": 1.0,
+    "abstention_on_unanswerable": 1.0,
+    "over_abstention_on_answerable": 0.6486486486486487,
+    "faithfulness": null,
+    "answer_relevancy": null,
+    "context_precision": null
+  }
+]

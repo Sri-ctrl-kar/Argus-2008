@@ -50,7 +50,12 @@ class RetrievalResult:
     def chunk_id(self) -> str:
         return self.chunk.chunk_id
 
+    @property
+    def text(self) -> str:
+        return self.chunk.text
+
     def to_dict(self) -> Dict[str, Any]:
+
 
         return {
             "chunk_id": self.chunk.chunk_id,
