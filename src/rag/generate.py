@@ -221,6 +221,25 @@ class GroundedGenerator:
             else:
                 response_text = " ".join(claims) + "."
 
+            # Optional LLM generation when OPENAI_API_KEY is configured
+            try:
+                from src.rag.llm import call_llm
+                sys_prompt = (
+                    "You are Argus, an expert financial intelligence assistant analyzing SEC 10-K filings. "
+                    "You must answer the user's question STRICTLY using the provided context chunks. "
+                    "Every factual statement must cite the source chunk ID in square brackets like [AAPL_10K_2025_ITEM_7_0369]. "
+                    f'If evidence is insufficient, reply with: "{ABSTENTION_PHRASE}".'
+                )
+                ctx_prompt = "\n\n".join([f"[{r.chunk.chunk_id}]: {r.chunk.text}" for r in retrieved_results[:5]])
+                full_prompt = f"Context:\n{ctx_prompt}\n\nQuestion: {query}\n\nAnswer:"
+                llm_response = call_llm(sys_prompt, full_prompt)
+                if llm_response and len(llm_response.strip()) > 5:
+                    response_text = llm_response.strip()
+                    abstained = ABSTENTION_PHRASE.lower() in response_text.lower()
+            except Exception:
+                pass
+
+
 
 
         # Verify citations
