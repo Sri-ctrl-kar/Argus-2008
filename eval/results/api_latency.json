@@ -1,0 +1,58 @@
+{
+  "hardware": {
+    "os": "Darwin",
+    "os_version": "Darwin Kernel Version 25.6.0: Fri Jul 31 19:11:03 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_T8132",
+    "machine": "arm64",
+    "processor": "arm",
+    "cpu_count_logical": 10,
+    "cpu_count_physical": 10,
+    "ram_gb": 16.0,
+    "python_version": "3.14.0"
+  },
+  "cold_starts_ms": {
+    "/score": 13.857250000000931,
+    "/ask": 2842.861791999894
+  },
+  "benchmarks": [
+    {
+      "endpoint": "/score",
+      "concurrency": 1,
+      "n_requests": 100,
+      "p50_ms": 2.67,
+      "p95_ms": 7.63,
+      "p99_ms": 10.8,
+      "min_ms": 2.37,
+      "max_ms": 21.34
+    },
+    {
+      "endpoint": "/score",
+      "concurrency": 10,
+      "n_requests": 100,
+      "p50_ms": 32.72,
+      "p95_ms": 58.41,
+      "p99_ms": 62.62,
+      "min_ms": 13.89,
+      "max_ms": 69.49
+    },
+    {
+      "endpoint": "/ask",
+      "concurrency": 1,
+      "n_requests": 30,
+      "p50_ms": 10.72,
+      "p95_ms": 15.4,
+      "p99_ms": 16.16,
+      "min_ms": 10.28,
+      "max_ms": 17.05
+    },
+    {
+      "endpoint": "/ask",
+      "concurrency": 10,
+      "n_requests": 30,
+      "p50_ms": 80.83,
+      "p95_ms": 94.61,
+      "p99_ms": 96.02,
+      "min_ms": 66.11,
+      "max_ms": 96.32
+    }
+  ]
+}
