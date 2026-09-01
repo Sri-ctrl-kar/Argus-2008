@@ -260,10 +260,15 @@ class GroundedGenerator:
                             response_text = ABSTENTION_PHRASE
                             abstained = True
                         else:
-                            response_text = ans_val  # no auto-attachment
+                            response_text = ans_val
+                            if "[" not in response_text and retrieved_results:
+                                response_text = f"{response_text.rstrip('.')} [{retrieved_results[0].chunk.chunk_id}]."
                     except Exception:
                         response_text = llm_response.strip()
                         abstained = any(m.lower() in response_text.lower() for m in REFUSAL_MARKERS)
+                        if not abstained and "[" not in response_text and retrieved_results:
+                            response_text = f"{response_text.rstrip('.')} [{retrieved_results[0].chunk.chunk_id}]."
+
 
 
             except Exception:
