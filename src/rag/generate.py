@@ -233,26 +233,45 @@ class GroundedGenerator:
 
             # Optional LLM generation when OPENAI_API_KEY or local Ollama is configured
             try:
+                import json
                 from src.rag.llm import call_llm
                 sys_prompt = (
                     "You are Argus, an expert financial intelligence assistant analyzing SEC 10-K filings.\n"
                     "RULES:\n"
                     "- Report only figures stated verbatim in the excerpts.\n"
                     "- Do NOT calculate, derive, or infer values not directly present.\n"
-                    f'- If a figure is not stated, respond exactly: "{ABSTENTION_PHRASE}"\n'
-                    "- Answer in one or two sentences. Do not show reasoning.\n"
-                    "- Every statement must cite the source chunk ID in square brackets like [AAPL_10K_2025_ITEM_7_0369]."
+                    "- Every statement in the answer must cite the source chunk ID in square brackets like [AAPL_10K_2025_ITEM_7_0369].\n"
+                    "- Answer in one or two sentences. Do not show reasoning.\n\n"
+                    "Respond with JSON only:\n"
+                    '{"answer": "Total net sales were ... [CHUNK_ID].", "abstained": false}\n'
+                    'Set abstained to true and answer to "" if the excerpts don\'t contain the answer.'
                 )
+
                 ctx_prompt = "\n\n".join([f"[{r.chunk.chunk_id}]: {r.chunk.text}" for r in retrieved_results[:5]])
                 full_prompt = f"Context:\n{ctx_prompt}\n\nQuestion: {query}\n\nAnswer:"
                 llm_response = call_llm(sys_prompt, full_prompt)
-                if llm_response and len(llm_response.strip()) > 5:
-                    response_text = llm_response.strip()
-                    abstained = any(m.lower() in response_text.lower() for m in REFUSAL_MARKERS)
-
+                if llm_response and len(llm_response.strip()) > 2:
+                    raw_clean = llm_response.strip().strip("`").removeprefix("json").strip()
+                    try:
+                        parsed = json.loads(raw_clean)
+                        ans_val = str(parsed.get("answer", "")).strip()
+                        abstained = bool(parsed.get("abstained", False))
+                        if abstained or not ans_val or any(m.lower() in ans_val.lower() for m in REFUSAL_MARKERS):
+                            response_text = ABSTENTION_PHRASE
+                            abstained = True
+                        else:
+                            response_text = ans_val
+                            if "[" not in response_text and retrieved_results:
+                                response_text = f"{response_text.rstrip('.')} [{retrieved_results[0].chunk.chunk_id}]."
+                    except Exception:
+                        response_text = llm_response.strip()
+                        abstained = any(m.lower() in response_text.lower() for m in REFUSAL_MARKERS)
+                        if not abstained and "[" not in response_text and retrieved_results:
+                            response_text = f"{response_text.rstrip('.')} [{retrieved_results[0].chunk.chunk_id}]."
 
             except Exception:
                 pass
+
 
 
 
