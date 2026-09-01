@@ -201,7 +201,8 @@ class GroundedGenerator:
             relevant_chunks = [r for r in retrieved_results if r.rank <= 3]
             claims = []
             for r in relevant_chunks:
-                sentences = [s.strip() for s in r.chunk.text.split(".") if len(s.strip()) > 20]
+                raw_sentences = [s.strip() for s in re.split(r"(?<=[a-zA-Z\)])\.\s+|\.\s+(?=[A-Z])|\n+", r.chunk.text) if s.strip()]
+                sentences = [s.rstrip(".") for s in raw_sentences if len(s) > 10] or [r.chunk.text.strip().rstrip(".")]
                 best_sentence = None
                 best_overlap = -1
                 for s in sentences:
@@ -214,6 +215,7 @@ class GroundedGenerator:
                     claims.append(f"{best_sentence} [{r.chunk.chunk_id}]")
                 elif sentences:
                     claims.append(f"{sentences[0]} [{r.chunk.chunk_id}]")
+
 
             if not claims:
                 response_text = ABSTENTION_PHRASE
