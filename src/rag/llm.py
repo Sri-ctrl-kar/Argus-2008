@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import logging
+import warnings
 from functools import lru_cache
 
 logger = logging.getLogger(__name__)
@@ -11,12 +12,12 @@ logger = logging.getLogger(__name__)
 
 @lru_cache(maxsize=2048)
 def _cached(system: str, prompt: str) -> str:
-    """Cached on (system, prompt) so ablation re-runs are near-free.
+    \"\"\"Cached on (system, prompt) so ablation re-runs are near-free.
 
     Note the key includes the prompt, which includes the retrieved contexts.
     Keying on the question alone would make every config return identical
     answers and faithfulness could not move.
-    """
+    \"\"\"
     from openai import OpenAI
     client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
     resp = client.chat.completions.create(
@@ -31,11 +32,19 @@ def _cached(system: str, prompt: str) -> str:
 
 
 def call_llm(system: str, prompt: str) -> str:
-    """Public entrypoint that checks for OPENAI_API_KEY and calls cached completion."""
-    if os.environ.get("OPENAI_API_KEY"):
-        try:
-            return _cached(system, prompt)
-        except Exception as e:
-            logger.warning(f"OpenAI completion call failed ({e}), falling back to deterministic extraction.")
-            return ""
-    return ""
+    \"\"\"Public entrypoint that checks for OPENAI_API_KEY and calls cached completion.\"\"\"
+    if not os.environ.get("OPENAI_API_KEY"):
+        warnings.warn(
+            "No API key — falling back to extractive mode. "
+            "Metrics from this run are NOT generation metrics.",
+            RuntimeWarning,
+            stacklevel=2,
+        )
+        return ""
+
+    try:
+        return _cached(system, prompt)
+    except Exception as e:
+        logger.warning(f"OpenAI completion call failed ({e}), falling back to deterministic extraction.")
+        return ""
+
