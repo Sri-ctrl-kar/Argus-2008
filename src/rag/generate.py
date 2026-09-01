@@ -248,7 +248,8 @@ class GroundedGenerator:
                 llm_response = call_llm(sys_prompt, full_prompt)
                 if llm_response and len(llm_response.strip()) > 5:
                     response_text = llm_response.strip()
-                    abstained = any(m.lower() in response_text.lower() for m in REFUSAL_MARKERS) or (ABSTENTION_PHRASE.lower() in response_text.lower())
+                    abstained = any(m.lower() in response_text.lower() for m in REFUSAL_MARKERS)
+
 
             except Exception:
                 pass
