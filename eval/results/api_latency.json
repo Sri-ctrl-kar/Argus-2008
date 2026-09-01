@@ -10,49 +10,64 @@
     "python_version": "3.14.0"
   },
   "cold_starts_ms": {
-    "/score": 46.24908299592789,
-    "/ask": 8202.154999991762
+    "/score": 46.44308300339617,
+    "/ask": 6293.002374994103
   },
   "benchmarks": [
     {
       "endpoint": "/score",
       "concurrency": 1,
       "n_requests": 100,
-      "p50_ms": 3.0,
-      "p95_ms": 5.16,
-      "p99_ms": 11.97,
-      "min_ms": 2.48,
-      "max_ms": 30.32
+      "p50_ms": 3.56,
+      "p95_ms": 6.59,
+      "p99_ms": 9.6,
+      "min_ms": 2.53,
+      "max_ms": 54.94,
+      "description": "Single transaction score"
     },
     {
       "endpoint": "/score",
       "concurrency": 10,
       "n_requests": 100,
-      "p50_ms": 34.68,
-      "p95_ms": 56.42,
-      "p99_ms": 59.32,
-      "min_ms": 15.9,
-      "max_ms": 61.28
+      "p50_ms": 39.02,
+      "p95_ms": 62.41,
+      "p99_ms": 70.55,
+      "min_ms": 11.72,
+      "max_ms": 77.0,
+      "description": "Concurrent transaction scoring"
     },
     {
       "endpoint": "/ask",
+      "description": "30 distinct 10-K questions (cold/first-seen)",
       "concurrency": 1,
       "n_requests": 30,
-      "p50_ms": 14.48,
-      "p95_ms": 22.45,
-      "p99_ms": 23.19,
-      "min_ms": 11.59,
-      "max_ms": 210.19
+      "p50_ms": 1639.03,
+      "p95_ms": 5132.34,
+      "p99_ms": 5378.38,
+      "min_ms": 19.35,
+      "max_ms": 5435.72
     },
     {
       "endpoint": "/ask",
+      "description": "30 repeat 10-K questions (LRU warm-cache)",
+      "concurrency": 1,
+      "n_requests": 30,
+      "p50_ms": 12.06,
+      "p95_ms": 18.01,
+      "p99_ms": 25.97,
+      "min_ms": 8.65,
+      "max_ms": 52.72
+    },
+    {
+      "endpoint": "/ask",
+      "description": "Concurrent document Q&A",
       "concurrency": 10,
       "n_requests": 30,
-      "p50_ms": 94.67,
-      "p95_ms": 109.87,
-      "p99_ms": 110.51,
-      "min_ms": 72.59,
-      "max_ms": 113.16
+      "p50_ms": 148.02,
+      "p95_ms": 187.34,
+      "p99_ms": 196.59,
+      "min_ms": 80.68,
+      "max_ms": 208.43
     }
   ]
 }

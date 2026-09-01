@@ -1,8 +1,8 @@
 """Argus API Latency Benchmarking Harness.
 
 Measures p50, p95, p99 latencies for /score and /ask endpoints under
-sequential (c=1) and concurrent (c=10) load, recording cold start and
-host hardware specifications.
+sequential and concurrent load, evaluating uncached vs cached /ask queries
+over the eval/questions.jsonl corpus.
 
 Run: python -m eval.benchmark_api
 """
@@ -15,9 +15,9 @@ import os
 import platform
 import statistics
 import time
-
 from pathlib import Path
 from typing import Any, Dict, List
+
 from fastapi.testclient import TestClient
 from api.main import app
 
@@ -25,11 +25,8 @@ RESULTS_DIR = Path("eval/results")
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
-
 def get_hardware_info() -> Dict[str, Any]:
-
     """Collect accurate host hardware specifications using standard library."""
-    import os
     import subprocess
 
     ram_gb = 16.0
@@ -52,22 +49,12 @@ def get_hardware_info() -> Dict[str, Any]:
     }
 
 
-
 def get_sample_score_payload() -> Dict[str, float]:
     """Sample transaction payload for /score benchmarking."""
     features = {f"V{i}": float(i * 0.1 - 1.4) for i in range(1, 29)}
     features["Time"] = 43200.0
     features["Amount"] = 149.50
     return features
-
-
-def get_sample_ask_payload() -> Dict[str, Any]:
-    """Sample query payload for /ask benchmarking."""
-    return {
-        "question": "What was Apple total net sales in fiscal 2025?",
-        "config": "section_dense",
-        "top_k": 3,
-    }
 
 
 def run_latency_benchmark(
@@ -132,18 +119,19 @@ def to_markdown_table(rows: List[Dict[str, Any]], cold_starts: Dict[str, float],
         "",
         f"**Cold Start Latency:** `/score`: `{cs_score:.1f}ms` | `/ask`: `{cs_ask:.1f}ms`",
         "",
-        "| Endpoint | p50 | p95 | p99 | Concurrency | Requests |",
-        "|---|---|---|---|---|---|",
+        "| Endpoint | Description | p50 | p95 | p99 | Concurrency | Requests |",
+        "|---|---|---|---|---|---|---|",
     ]
     for r in rows:
         ep = r["endpoint"]
+        desc = r.get("description", "")
         p50 = r["p50_ms"]
         p95 = r["p95_ms"]
         p99 = r["p99_ms"]
         conc = r["concurrency"]
         n_req = r["n_requests"]
         lines.append(
-            f"| `{ep}` | {p50:.1f}ms | {p95:.1f}ms | {p99:.1f}ms | {conc} | {n_req} |"
+            f"| `{ep}` | {desc} | {p50:.1f}ms | {p95:.1f}ms | {p99:.1f}ms | {conc} | {n_req} |"
         )
     return "\n".join(lines)
 
@@ -160,9 +148,14 @@ def main() -> None:
     pyv = hw["python_version"]
     print(f"Hardware: {proc} ({mach}) | {ram} GB RAM | Python {pyv}")
 
+    # Load 30 questions from eval/questions.jsonl
+    questions_file = Path("eval/questions.jsonl")
+    if questions_file.exists():
+        qs = [json.loads(l)["question"] for l in questions_file.read_text().splitlines() if l.strip()][:30]
+    else:
+        qs = ["What was Apple total net sales in fiscal 2025?"] * 30
 
     score_payload = get_sample_score_payload()
-    ask_payload = get_sample_ask_payload()
 
     with TestClient(app) as client:
         # Measure Cold Starts
@@ -173,7 +166,7 @@ def main() -> None:
         assert resp_score.status_code == 200
 
         t0 = time.perf_counter()
-        resp_ask = client.post("/ask", json=ask_payload)
+        resp_ask = client.post("/ask", json={"question": qs[0]})
         t_cold_ask = (time.perf_counter() - t0) * 1000
         assert resp_ask.status_code == 200
 
@@ -181,28 +174,86 @@ def main() -> None:
         print(f"  Cold Start /score: {t_cold_score:.2f}ms")
         print(f"  Cold Start /ask:   {t_cold_ask:.2f}ms")
 
-        # Benchmarks
         rows = []
 
+        # 1. /score Sequential
         print("\n--- Benchmarking /score (Sequential c=1) ---")
         r1 = run_latency_benchmark(client, "/score", score_payload, concurrency=1, n_requests=100)
+        r1["description"] = "Single transaction score"
         rows.append(r1)
         print(f"  /score (c=1):  p50={r1['p50_ms']}ms | p95={r1['p95_ms']}ms | p99={r1['p99_ms']}ms")
 
+        # 2. /score Concurrent
         print("\n--- Benchmarking /score (Concurrent c=10) ---")
         r2 = run_latency_benchmark(client, "/score", score_payload, concurrency=10, n_requests=100)
+        r2["description"] = "Concurrent transaction scoring"
         rows.append(r2)
         print(f"  /score (c=10): p50={r2['p50_ms']}ms | p95={r2['p95_ms']}ms | p99={r2['p99_ms']}ms")
 
-        print("\n--- Benchmarking /ask (Sequential c=1) ---")
-        r3 = run_latency_benchmark(client, "/ask", ask_payload, concurrency=1, n_requests=30)
-        rows.append(r3)
-        print(f"  /ask (c=1):    p50={r3['p50_ms']}ms | p95={r3['p95_ms']}ms | p99={r3['p99_ms']}ms")
 
+        # 3. /ask Uncached vs Cached Evaluation
+        print(f"\n--- Benchmarking /ask across {len(qs)} corpus questions ---")
+        def timed_ask(q: str) -> float:
+            t = time.perf_counter()
+            resp = client.post("/ask", json={"question": q})
+            assert resp.status_code == 200
+            return (time.perf_counter() - t) * 1000
+
+        cold_times = [timed_ask(q) for q in qs]        # each question seen for the first time
+        warm_times = [timed_ask(q) for q in qs]        # same questions, now cached
+
+        for label, xs, desc in (
+            ("uncached", cold_times, "30 distinct 10-K questions (cold/first-seen)"),
+            ("cached", warm_times, "30 repeat 10-K questions (LRU warm-cache)"),
+        ):
+            xs_sorted = sorted(xs)
+            p50 = statistics.median(xs_sorted)
+            p95 = xs_sorted[int(0.95 * len(xs_sorted)) - 1]
+            p99 = xs_sorted[int(0.99 * len(xs_sorted)) - 1]
+            print(f"{label:<10} p50 {p50:7.1f}ms  p95 {p95:7.1f}ms")
+            rows.append({
+                "endpoint": "/ask",
+                "description": desc,
+                "concurrency": 1,
+                "n_requests": len(xs),
+                "p50_ms": round(p50, 2),
+                "p95_ms": round(p95, 2),
+                "p99_ms": round(p99, 2),
+                "min_ms": round(xs_sorted[0], 2),
+                "max_ms": round(xs_sorted[-1], 2),
+            })
+
+        # 4. /ask Concurrent c=10
         print("\n--- Benchmarking /ask (Concurrent c=10) ---")
-        r4 = run_latency_benchmark(client, "/ask", ask_payload, concurrency=10, n_requests=30)
-        rows.append(r4)
-        print(f"  /ask (c=10):   p50={r4['p50_ms']}ms | p95={r4['p95_ms']}ms | p99={r4['p99_ms']}ms")
+        def send_concurrent_ask(q: str) -> float:
+            t = time.perf_counter()
+            resp = client.post("/ask", json={"question": q})
+            assert resp.status_code == 200
+            return (time.perf_counter() - t) * 1000
+
+        concurrent_latencies = []
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+            futures = [executor.submit(send_concurrent_ask, qs[i % len(qs)]) for i in range(30)]
+            for f in concurrent.futures.as_completed(futures):
+                concurrent_latencies.append(f.result())
+
+        c_sorted = sorted(concurrent_latencies)
+        p50 = statistics.median(c_sorted)
+        p95 = c_sorted[int(0.95 * len(c_sorted)) - 1]
+        p99 = c_sorted[int(0.99 * len(c_sorted)) - 1]
+        r_conc = {
+            "endpoint": "/ask",
+            "description": "Concurrent document Q&A",
+            "concurrency": 10,
+            "n_requests": len(c_sorted),
+            "p50_ms": round(p50, 2),
+            "p95_ms": round(p95, 2),
+            "p99_ms": round(p99, 2),
+            "min_ms": round(c_sorted[0], 2),
+            "max_ms": round(c_sorted[-1], 2),
+        }
+        rows.append(r_conc)
+        print(f"  /ask (c=10):   p50={r_conc['p50_ms']}ms | p95={r_conc['p95_ms']}ms | p99={r_conc['p99_ms']}ms")
 
 
     # Save results
