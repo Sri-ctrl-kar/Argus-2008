@@ -172,6 +172,13 @@ def run_config(name: str, questions: list[dict]) -> dict:
 
     ragas = score_with_ragas(generations)
     result.update(ragas)
+    for g in generations:
+        if "faithfulness" not in g:
+            g["faithfulness"] = 0.0
+            g["answer_relevancy"] = 0.0
+            g["context_precision"] = 0.0
+    result["_per_question"] = generations
+
 
     print(
         f"  R@1 {result['recall@1']:.3f}  R@5 {result['recall@5']:.3f}  "
@@ -228,19 +235,25 @@ def score_with_ragas(generations: list[dict]) -> dict:
             q_emb = model.encode(g["question"], normalize_embeddings=True)
             a_emb = model.encode(g["answer"], normalize_embeddings=True)
             sim = float(np.dot(q_emb, a_emb))
-            relevancy_scores.append(max(0.0, min(1.0, (sim + 1.0) / 2.0)))
+            rel = max(0.0, min(1.0, (sim + 1.0) / 2.0))
+            relevancy_scores.append(rel)
+            g["answer_relevancy"] = rel
 
             # 2. Faithfulness: grounding of answer in retrieved context
             ans_tokens = set(g["answer"].lower().split())
             ctx_text = " ".join(g["contexts"]).lower()
             overlap = sum(1 for t in ans_tokens if t in ctx_text) / max(1, len(ans_tokens))
-            faithfulness_scores.append(min(1.0, overlap * 1.05))
+            faith = min(1.0, overlap * 1.05)
+            faithfulness_scores.append(faith)
+            g["faithfulness"] = faith
 
             # 3. Context Precision: whether early contexts contain relevant answer signals
             gt_terms = set(g["ground_truth"].lower().split())
             hits = [any(t in c.lower() for t in gt_terms if len(t) > 3) for c in g["contexts"]]
             prec = sum(h / (i + 1) for i, h in enumerate(hits)) / max(1, len(hits))
-            precision_scores.append(min(1.0, prec))
+            prec_clamped = min(1.0, prec)
+            precision_scores.append(prec_clamped)
+            g["context_precision"] = prec_clamped
 
         return {
             "faithfulness": float(np.mean(faithfulness_scores)),
@@ -250,6 +263,7 @@ def score_with_ragas(generations: list[dict]) -> dict:
     except Exception as e:
         print(f"  (Local judge evaluation error: {e})")
         return {"faithfulness": None, "answer_relevancy": None, "context_precision": None}
+
 
 
 
