@@ -1,7 +1,9 @@
 """Empirical Evaluation & Measurement Integrity Page."""
 
+import app._bootstrap  # noqa: F401
 import pandas as pd
 import streamlit as st
+
 from app.components.shared import (
     load_ablation_metrics,
     load_fraud_artifacts,

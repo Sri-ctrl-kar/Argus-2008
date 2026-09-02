@@ -1,6 +1,8 @@
 """Argus Financial Intelligence Platform — Streamlit Landing & System Overview."""
 
+import app._bootstrap  # noqa: F401
 import streamlit as st
+
 
 st.set_page_config(
     page_title="Argus — Financial Intelligence Platform",

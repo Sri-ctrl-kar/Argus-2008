@@ -1,6 +1,8 @@
 """SEC 10-K Grounded Document Question-Answering Page."""
 
+import app._bootstrap  # noqa: F401
 import streamlit as st
+
 from app.components.shared import query_rag_service
 
 st.set_page_config(
