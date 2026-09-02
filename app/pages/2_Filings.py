@@ -1,10 +1,12 @@
-"""SEC 10-K Grounded Document Question-Answering Page."""
+import sys
+from pathlib import Path
 
-import app._bootstrap  # noqa: F401  — must precede app/src imports
+# Insert project root before any app/src import
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
 import streamlit as st
-
-
 from app.components.shared import query_rag_service
+
 
 st.set_page_config(
     page_title="Argus — SEC 10-K Document Q&A",

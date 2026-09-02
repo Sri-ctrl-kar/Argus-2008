@@ -1,11 +1,13 @@
-"""Empirical Evaluation & Measurement Integrity Page."""
+import sys
+from pathlib import Path
 
-import app._bootstrap  # noqa: F401  — must precede app/src imports
+# Insert project root before any app/src import
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
 import pandas as pd
-
 import streamlit as st
-
 from app.components.shared import (
+
     load_ablation_metrics,
     load_fraud_artifacts,
     load_latency_metrics,
