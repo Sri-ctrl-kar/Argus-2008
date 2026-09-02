@@ -188,13 +188,16 @@ python -m src.explain
 python -m src.rag.index
 python -m eval.ablation
 
-# 4. Start FastAPI Service
+# 4. Launch Interactive Streamlit Dashboard (Phase 4)
+streamlit run app/Home.py
+
+# 5. Start FastAPI Service (Phase 3)
 uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
 
-# 5. Run API Latency Benchmarking Suite
+# 6. Run API Latency Benchmarking Suite
 python -m eval.benchmark_api
 
-# 6. Execute Full Automated Test Suite (16/16 passing)
+# 7. Execute Full Automated Test Suite (16/16 passing)
 pytest tests/ -v
 ```
 
@@ -204,9 +207,19 @@ pytest tests/ -v
 
 ```
 Argus/
+├── app/
+│   ├── Home.py                # Streamlit landing page & system capabilities
+│   ├── pages/
+│   │   ├── 1_Fraud.py         # Transaction scoring, presets & SHAP waterfall
+│   │   ├── 2_Filings.py       # SEC 10-K document Q&A & citation inspection
+│   │   └── 3_Evaluation.py    # Dynamic ablation & latency tables from JSON
+│   └── components/
+│       ├── shared.py          # Cached loaders, SHAP generation & RAG runner
+│       └── presets.json       # Canonical real-world test set scenarios
 ├── api/
 │   ├── main.py                # FastAPI application, lifespan startup, routes
 │   ├── schemas.py             # Pydantic request/response validation models
+
 │   ├── services.py            # Pure thin wrappers over src/ (zero logic duplication)
 │   └── deps.py                # Single-lifespan artifact loader & provenance registry
 ├── data/
