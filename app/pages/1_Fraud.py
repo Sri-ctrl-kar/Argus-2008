@@ -1,8 +1,9 @@
 """Fraud Transaction Scoring & SHAP Waterfall Explainer Page."""
 
-import app._bootstrap  # noqa: F401
+import app._bootstrap  # noqa: F401  — must precede app/src imports
 import pandas as pd
 import streamlit as st
+
 
 from app.components.shared import (
     compute_shap_waterfall,
