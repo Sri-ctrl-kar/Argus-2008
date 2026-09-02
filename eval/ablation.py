@@ -149,6 +149,8 @@ def run_config(name: str, questions: list[dict]) -> dict:
 
     n = len(answerable)
     cited = [g for g in generations if g["n_citations"] > 0]
+    answered = [g for g in generations if not g["abstained"]]
+    uncited_count = sum(1 for g in answered if g["n_citations"] == 0)
 
     result = {
         "config": name,
@@ -162,6 +164,7 @@ def run_config(name: str, questions: list[dict]) -> dict:
         "citation_precision": (
             sum(g["citations_valid"] for g in cited) / len(cited) if cited else None
         ),
+        "uncited": uncited_count / len(answered) if answered else 0.0,
         "abstention_on_unanswerable": (
             abstained_correctly / len(unanswerable) if unanswerable else None
         ),
@@ -169,6 +172,7 @@ def run_config(name: str, questions: list[dict]) -> dict:
             sum(g["abstained"] for g in generations) / n
         ),
     }
+
 
     ragas = score_with_ragas(generations)
     result.update(ragas)
@@ -276,19 +280,20 @@ def to_markdown(rows: list[dict]) -> str:
 
     header = (
         "| Configuration | R@1 | R@3 | R@5 | MRR | Faithfulness | "
-        "Citation prec. | Abstention (unans.) | Median latency |"
+        "Citation prec. | Uncited | Abstention (unans.) | Median latency |"
     )
-    sep = "|" + "---|" * 9
+    sep = "|" + "---|" * 10
     lines = [header, sep]
     for r in rows:
         lines.append(
             f"| {r['label']} | {cell(r['recall@1'])} | {cell(r['recall@3'])} | "
             f"{cell(r['recall@5'])} | {cell(r['mrr'])} | {cell(r.get('faithfulness'))} | "
-            f"{cell(r.get('citation_precision'))} | "
+            f"{cell(r.get('citation_precision'))} | {cell(r.get('uncited', 0.0))} | "
             f"{cell(r.get('abstention_on_unanswerable'))} | "
             f"{r['latency_ms_median']:.0f}ms |"
         )
     return "\n".join(lines)
+
 
 
 def sanity_check(rows: list[dict]) -> None:

@@ -683,7 +683,8 @@
         "faithfulness": 0.0,
         "context_precision": 0.39
       }
-    ]
+    ],
+    "uncited": 0.0
   },
   {
     "config": "fixed_dense",
@@ -1369,7 +1370,8 @@
         "faithfulness": 0.8400000000000001,
         "context_precision": 0.45666666666666667
       }
-    ]
+    ],
+    "uncited": 0.0
   },
   {
     "config": "section_dense",
@@ -2055,7 +2057,8 @@
         "faithfulness": 0.0,
         "context_precision": 0.45666666666666667
       }
-    ]
+    ],
+    "uncited": 0.036
   },
   {
     "config": "section_hybrid",
@@ -2741,7 +2744,8 @@
         "faithfulness": 0.0,
         "context_precision": 0.45666666666666667
       }
-    ]
+    ],
+    "uncited": 0.032
   },
   {
     "config": "section_hybrid_rerank",
@@ -3427,6 +3431,7 @@
         "faithfulness": 0.721875,
         "context_precision": 0.4166666666666667
       }
-    ]
+    ],
+    "uncited": 0.0
   }
 ]

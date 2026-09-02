@@ -58,20 +58,21 @@ SEC EDGAR 10-Ks (AAPL, MSFT, NVDA, AMZN, GOOGL, META, TSLA, AMD, INTC, NFLX)
 
 ### Ablation Study Results (`eval/results/ablation.json`)
 
-Evaluated across **45 hand-verified ground-truth questions** (20 factual lookup, 10 multi-hop synthesis, 7 comparative, and 8 unanswerable questions) across 10 corporate 10-K filings:
+Evaluated across **45 hand-verified ground-truth questions** (37 answerable financial queries and 8 out-of-domain unanswerable queries) across 10 corporate SEC 10-K filings with local Llama 3.1:
 
-| Configuration | Recall@5 | MRR | Faithfulness | Citation Precision | Abstention Rate |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| **Fixed chunks + dense** | **94.6%** | **0.9459** | **70.0%** | **100.0%** | **100.0%** |
-| **Section chunks + dense** | **94.6%** | **0.9054** | **70.0%** | **100.0%** | **100.0%** |
-| **Section chunks + hybrid (BM25 + Dense)** | **94.6%** | **0.9144** | **70.0%** | **100.0%** | **100.0%** |
-| **Section chunks + hybrid + CrossEncoder rerank** | **94.6%** | **0.9054** | **70.0%** | **100.0%** | **100.0%** |
+| Configuration | R@1 | R@3 | R@5 | MRR | Faithfulness | Citation prec. | Uncited | Abstention (unans.) | Median latency |
+|---|---|---|---|---|---|---|---|---|---|
+| BM25 only (diagnostic) | 0.189 | 0.189 | 0.189 | 0.189 | 0.600 | 1.000 | 0.000 | 1.000 | 37ms |
+| Fixed chunks + dense | 0.243 | 0.297 | 0.378 | 0.289 | 0.618 | 1.000 | 0.000 | 1.000 | 68ms |
+| Section chunks + dense | 0.243 | 0.378 | 0.405 | 0.309 | 0.602 | 1.000 | 0.036 | 1.000 | 226ms |
+| Section chunks + hybrid (BM25 + dense) | 0.135 | 0.270 | 0.297 | 0.199 | 0.601 | 1.000 | 0.032 | 1.000 | 271ms |
+| Section chunks + hybrid + rerank | 0.216 | 0.324 | 0.351 | 0.259 | 0.663 | 1.000 | 0.000 | 1.000 | 454ms |
 
-### Key Findings & Innovations:
-1. **Section-Aware Chunking**: Preserving 10-K Item boundaries prevents cross-section context contamination (e.g. distinguishing stated risk factors in Item 1A from realized financial results in Item 7).
-2. **Hybrid Search (Dense + BM25)**: Combining semantic vectors with exact BM25 keyword matching via Reciprocal Rank Fusion (RRF) ensures precise retrieval for exact balance sheet line items, dollar amounts, and ticker codes.
-3. **Programmatic Citation Verification**: Rather than trusting LLM outputs blindly, Argus extracts every `[chunk_id]` in the generated text and programmatically asserts that the cited ID was part of the retrieved candidate set (100% citation precision).
-4. **Reliable Abstention**: Out-of-corpus or unanswerable questions (e.g., non-existent products, futuristic guidance, unitemized metrics) trigger explicit abstention rather than hallucinating plausible financial figures.
+Retrieval is the bottleneck; generation is not the differentiator. Retrieval configuration moves retrieval metrics substantially (MRR 0.189–0.309) but leaves faithfulness flat at ~0.60 across all five configurations. Grounding quality is bounded by the 8B generator, not by retrieval strategy. The system reliably answers from its context — it often has the wrong context.
+
+> [!NOTE]
+> **Caveat:** 37 answerable questions. Confidence intervals on every configuration overlap. This eval set can rank retrieval strategies weakly and cannot rank generation quality at all.
+
 
 ---
 
