@@ -47,6 +47,9 @@ def get_presets() -> Dict[str, Any]:
     return {}
 
 
+from imblearn.base import SamplerMixin
+
+
 def compute_shap_waterfall(
     row_dict: Dict[str, float],
     meta: Dict[str, Any],
@@ -58,11 +61,18 @@ def compute_shap_waterfall(
     features = meta["features"]
     df_row = pd.DataFrame([row_dict])[features]
 
-    # Preprocess row through pipeline transformers (excluding classifier)
-    if hasattr(pipeline, "named_steps"):
-        preprocessed = df_row
+    # Preprocess row through pipeline transformers (excluding classifier and samplers)
+    preprocessed = df_row
+    if hasattr(pipeline, "steps"):
+        for name, step in pipeline.steps[:-1]:  # everything but the classifier
+            if isinstance(step, SamplerMixin):  # SMOTE and friends: training only
+                continue
+            preprocessed = step.transform(preprocessed)
+    elif hasattr(pipeline, "named_steps"):
         for name, step in pipeline.named_steps.items():
             if name != "classifier":
+                if isinstance(step, SamplerMixin):
+                    continue
                 preprocessed = step.transform(preprocessed)
     else:
         preprocessed = df_row.values
@@ -81,6 +91,7 @@ def compute_shap_waterfall(
     plt.title("SHAP Waterfall: What Drove This Risk Score?", fontsize=13, pad=15, weight="bold")
     plt.tight_layout()
     return fig
+
 
 
 @st.cache_data
