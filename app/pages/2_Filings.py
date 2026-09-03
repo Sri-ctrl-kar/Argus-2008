@@ -83,25 +83,27 @@ st.markdown("---")
 
 # Execution button
 if st.button("Run Grounded Retrieval & Answer Synthesis", type="primary"):
-    with st.spinner("Executing dense vector retrieval across 13,467 chunks and synthesizing grounded answer..."):
-        # Augment query with company filter hint if specified
-        final_query = user_query
-        if company_filter != "All Tickers (Cross-corpus search)":
-            final_query = f"{company_filter}: {user_query}"
+    try:
+        with st.spinner("Executing dense vector retrieval across 13,467 chunks and synthesizing grounded answer..."):
+            # Augment query with company filter hint if specified
+            final_query = user_query
+            if company_filter != "All Tickers (Cross-corpus search)":
+                final_query = f"{company_filter}: {user_query}"
 
-        res = query_rag_service(final_query, config_name=config_key)
+            res = query_rag_service(final_query, config_name=config_key)
+            if "error" in res and res.get("error"):
+                raise RuntimeError(res["error"])
+    except Exception as exc:
+        st.error(f"Retrieval failed: {exc}")
+        st.stop()
 
     st.subheader("3. Synthesized Answer & Programmatic Citation Audit")
 
     if res.get("abstained"):
-        st.warning(
-            f"🛑 **MODEL ABSTAINED**: {res['answer']}\n\n"
-            "The system refused to answer because the retrieved chunks did not contain "
-            "verbatim figures directly answering the prompt. In production financial intelligence, "
-            "abstention is a critical safety feature preventing hallucinations."
-        )
+        st.warning("**Model abstained** — retrieved passages did not contain the requested figure.")
     else:
-        st.success(f"**Answer**: {res['answer']}")
+        st.success(res.get("answer", ""))
+
 
     # Citation Verification Telemetry
     verif = res.get("verification", {})
