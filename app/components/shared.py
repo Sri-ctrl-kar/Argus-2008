@@ -103,20 +103,30 @@ def load_latency_metrics() -> Dict[str, Any]:
     return {}
 
 
+import os
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
+@st.cache_resource(show_spinner="Initializing RAG Retriever & Vector Store...")
+def get_cached_retriever(config_name: str):
+    from src.rag.retrieve import RAGRetriever
+    use_hybrid = "hybrid" in config_name or config_name == "bm25_only"
+    use_rerank = "rerank" in config_name
+    strategy = "fixed_size" if "fixed" in config_name else "section_aware"
+    return RAGRetriever(strategy=strategy, use_hybrid=use_hybrid, use_reranker=use_rerank)
+
+@st.cache_resource
+def get_cached_generator():
+    from src.rag.generate import GroundedGenerator
+    return GroundedGenerator()
+
 def query_rag_service(query: str, config_name: str = "section_dense") -> Dict[str, Any]:
     """Execute SEC 10-K RAG query with in-process fallback and graceful failure degradation."""
     try:
-        from src.rag.retrieve import RAGRetriever
-        from src.rag.generate import GroundedGenerator
-
-        use_hybrid = "hybrid" in config_name or config_name == "bm25_only"
-        use_rerank = "rerank" in config_name
-        strategy = "fixed_size" if "fixed" in config_name else "section_aware"
-
-        retriever = RAGRetriever(strategy=strategy, use_hybrid=use_hybrid, use_reranker=use_rerank)
+        retriever = get_cached_retriever(config_name)
         results = retriever.retrieve(query, top_k=5)
-        generator = GroundedGenerator()
+        generator = get_cached_generator()
         ans = generator.generate_answer(query, results)
+
 
         return {
             "answer": ans.response_text,
