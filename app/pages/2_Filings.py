@@ -83,30 +83,29 @@ st.markdown("---")
 
 # Execution button
 if st.button("Run Grounded Retrieval & Answer Synthesis", type="primary"):
+    question = user_query
+    if company_filter != "All Tickers (Cross-corpus search)":
+        question = f"{company_filter}: {user_query}"
+
     try:
         with st.spinner("Executing dense vector retrieval across 13,467 chunks and synthesizing grounded answer..."):
-            # Augment query with company filter hint if specified
-            final_query = user_query
-            if company_filter != "All Tickers (Cross-corpus search)":
-                final_query = f"{company_filter}: {user_query}"
-
-            res = query_rag_service(final_query, config_name=config_key)
-            if "error" in res and res.get("error"):
-                raise RuntimeError(res["error"])
+            result = query_rag_service(question, config_name=config_key)
+            if "error" in result and result.get("error"):
+                raise RuntimeError(result["error"])
     except Exception as exc:
-        st.error(f"Retrieval failed: {exc}")
+        st.error(f"Retrieval failed: {exc}")     # red, honest, no safety narrative
         st.stop()
 
     st.subheader("3. Synthesized Answer & Programmatic Citation Audit")
 
-    if res.get("abstained"):
-        st.warning("**Model abstained** — retrieved passages did not contain the requested figure.")
+    if result["abstained"]:
+        st.warning("**Model abstained** — retrieved passages did not contain "
+                   "the requested figure.")       # this is the real feature
     else:
-        st.success(res.get("answer", ""))
-
+        st.success(result["answer"])
 
     # Citation Verification Telemetry
-    verif = res.get("verification", {})
+    verif = result.get("verification", {})
     cited_ids = verif.get("cited_ids", [])
     hallucinated_ids = verif.get("hallucinated_ids", [])
     is_valid = verif.get("is_valid", True)
@@ -132,7 +131,8 @@ if st.button("Run Grounded Retrieval & Answer Synthesis", type="primary"):
         "retrieving the wrong context (e.g. financial tables instead of narrative) vs. generation error."
     )
 
-    citations = res.get("citations", [])
+    citations = result.get("citations", [])
+
     if not citations:
         st.write("No candidate chunks returned.")
     else:
