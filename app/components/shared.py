@@ -130,11 +130,11 @@ def get_cached_generator():
     from src.rag.generate import GroundedGenerator
     return GroundedGenerator()
 
-def query_rag_service(query: str, config_name: str = "section_dense") -> Dict[str, Any]:
+def query_rag_service(query: str, config_name: str = "section_dense", k: int = 5) -> Dict[str, Any]:
     """Execute SEC 10-K RAG query with in-process fallback and graceful failure degradation."""
     try:
         retriever = get_cached_retriever(config_name)
-        results = retriever.retrieve(query, k=5)
+        results = retriever.retrieve(query, k=k)
         generator = get_cached_generator()
 
         ans = generator.generate_answer(query, results)

@@ -89,20 +89,20 @@ if st.button("Run Grounded Retrieval & Answer Synthesis", type="primary"):
 
     try:
         with st.spinner("Executing dense vector retrieval across 13,467 chunks and synthesizing grounded answer..."):
-            result = query_rag_service(question, config_name=config_key)
+            result = query_rag_service(question, config_name=config_key, k=5)
             if "error" in result and result.get("error"):
                 raise RuntimeError(result["error"])
     except Exception as exc:
-        st.error(f"Retrieval failed: {exc}")     # red, honest, no safety narrative
+        st.error(f"Retrieval failed: {type(exc).__name__}: {exc}")
         st.stop()
 
     st.subheader("3. Synthesized Answer & Programmatic Citation Audit")
 
     if result["abstained"]:
-        st.warning("**Model abstained** — retrieved passages did not contain "
-                   "the requested figure.")       # this is the real feature
+        st.warning("**Model abstained** — retrieved passages didn't contain the requested figure.")
     else:
         st.success(result["answer"])
+
 
     # Citation Verification Telemetry
     verif = result.get("verification", {})
